@@ -1,0 +1,44 @@
+# Composer vendor folder
+/vendor/
+
+# Node modules
+/node_modules/
+
+# Tailwind CSS build artifacts
+*.css.map
+*.js.map
+
+# IDE specific files
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs and debug files
+*.log
+
+# Writable directory contents
+writable/cache/
+writable/debugbar/
+writable/logs/
+writable/session/
+writable/uploads/
+!.gitkeep
+
+# Environment files
+.env
+
+# PHPStorm specific
+*.iml
+
+# CodeIgniter specific
+application/cache/*
+application/logs/*
+!application/cache/index.html
+!application/logs/index.html
+
+# Public assets
+public/uploads/*
+!public/uploads/index.html
