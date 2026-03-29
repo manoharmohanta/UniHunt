@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light Mode */
+    --primary: 21 84 196;
+    /* #1554c4 - Vibrant Blue */
+    --secondary: 201 19 49;
+    /* #c91331 - Brand Red */
+    --text-main: 11 18 32;
+    /* #0b1220 */
+    --text-muted: 91 107 138;
+    /* #5b6b8a */
+
+    --background: 248 250 252;
+    /* #f8fafc */
+    --surface: 255 255 255;
+    /* #ffffff */
+    --border: 219 226 239;
+    /* #dbe2ef */
+  }
+
+  .dark {
+    /* Dark Mode - Better Visibility */
+    --primary: 96 165 250;
+    /* #60A5FA - Bright Blue for icons/links */
+    --secondary: 248 113 113;
+    /* #F87171 - Bright Red */
+    --text-main: 241 245 249;
+    /* #f1f5f9 - Slate-100 */
+    --text-muted: 156 163 175;
+    /* #9ca3af - Gray-400 */
+
+    --background: 12 20 36;
+    /* #0c1424 - Dark Navy */
+    --surface: 18 26 47;
+    /* #121a2f - Lighter Navy for cards */
+    --border: 30 42 68;
+    /* #1e2a44 - Slate Blue border */
+  }
+}
+
+@layer components {
+
+  /* Global Fixes */
+  .dark .material-symbols-outlined {
+    color: inherit;
+  }
+
+  /* Ensure dynamic primary brand color always has visibility */
+  .text-primary {
+    color: rgb(var(--primary));
+  }
+}
+
+/* Global body and heading defaults for dark mode redundancy */
+.dark body {
+  background-color: rgb(var(--background));
+  color: rgb(var(--text-main));
+}
+
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6 {
+  color: rgb(var(--text-main));
+}

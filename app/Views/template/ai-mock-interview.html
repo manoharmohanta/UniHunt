@@ -1,0 +1,400 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>AI Mock Visa Interview - Active Session</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
+    <script src="https://unpkg.com/heroicons@2.1.5/outline/index.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#012169",          // Brand navy blue
+                        "primary-hover": "#023a8f",    // Lighter navy for hover
+                        "primary-soft": "#e6ebf4",     // Soft blue background
+
+                        "background-light": "#f8fafc", // Cool light background
+                        "background-dark": "#0c1424",  // Dark navy background
+
+                        "card-light": "#ffffff",
+                        "card-dark": "#121a2f",        // Dark card with blue tone
+
+                        "text-main": "#0b1220",        // Deep readable text
+                        "text-muted": "#5b6b8a",       // Muted blue-gray text
+
+                        "border-light": "#dbe2ef",
+                        "border-dark": "#1e2a44",
+
+                        "success": "#1b9c85",
+                        "warning": "#f0b429",
+                        "danger": "#d64545",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    boxShadow: {
+                        "soft": "0 4px 20px -2px rgba(14, 117, 129, 0.08)",
+                        "card": "0 2px 8px -1px rgba(0, 0, 0, 0.05)",
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <script>
+        // Check local time (Day: 6 AM - 6 PM)
+        const hours = new Date().getHours();
+        const isDayTime = hours >= 6 && hours < 18;
+        
+        // Check storage or default to time-based
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && !isDayTime)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        }
+    </script>
+<style>
+        /* Custom scrollbar for transcript */
+        .transcript-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .transcript-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .transcript-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-[#121617] dark:text-white font-display flex flex-col h-screen overflow-hidden">
+    <!-- Header -->
+    <nav
+        class="sticky top-0 z-50 w-full bg-card-light/90 dark:bg-card-dark/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-3">
+                    <img 
+                        src="https://unihunt.org/public/assets/img/logo.webp" 
+                        alt="UniHunt Logo"
+                        class="h-8 w-auto"
+                    />
+                </a>
+                <!-- Desktop Links -->
+                <div class="hidden md:flex items-center gap-8">
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="university.html">Universities</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="course.html">Courses</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="#">AI Tools</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="blog.html">Blog</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="#">Accommodation</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="contact.html">Contact Us</a>
+                </div>
+                <!-- CTA Buttons -->
+                <div class="hidden md:flex items-center gap-3">
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleTheme()" 
+                        class="p-2 mr-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-text-main dark:text-white" 
+                        aria-label="Toggle Dark Mode">
+                        <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+                        <span class="material-symbols-outlined hidden dark:block">light_mode</span>
+                    </button>
+                    <a href="forget.html"
+                        class="px-4 py-2 text-sm font-bold text-text-main bg-background-light hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 rounded-lg transition-colors">
+                        Sign In
+                    </a>
+                    <button
+                        class="px-4 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-hover rounded-lg shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
+                        Get Started
+                    </button>
+                </div>
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button class="text-text-main dark:text-white p-2">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Main Content Grid -->
+    <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 overflow-hidden max-w-[1600px] mx-auto w-full">
+        <!-- Left Column: Officer Video & Transcript (7/12) -->
+        <div class="lg:col-span-7 flex flex-col gap-4 h-full min-h-0">
+            <!-- Video Feed Area -->
+            <div
+                class="relative w-full aspect-video lg:aspect-auto lg:h-[55%] shrink-0 rounded-xl overflow-hidden shadow-md group">
+                <!-- Background Image of Officer -->
+                <div class="absolute inset-0 bg-cover bg-center"
+                    data-alt="Professional visa officer sitting at a desk in a modern office looking at camera"
+                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDqFmoF1BMEhdur1VvNenYvlSujmEI3q7OU3V124Z59Gx8xtrs7zqOMTQKyfiuVXngbYWWjPBPOr_gqy7wM0K3Nk0xlBp6_hhGCYIYPQH8iVJiMj8GzJvXRHzTqxzYyFqly3uN5Deu7DjDX09IIPzLzWGJQlgKM6nLyK9uVJBb04pzu6QrCm0ERNH2IeUGfZaPyBvHYg5M0RDG3Gf4HFfo9sHORP2d4oZvSNA9Rfo_DLCLr7ieQCCzWen6ui2EzsERQthb2B6moQ1kU");'>
+                </div>
+                <!-- Overlay Gradient -->
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <!-- Status Badge -->
+                <div class="absolute top-4 left-4">
+                    <div
+                        class="flex items-center gap-2 px-3 py-1.5 bg-black/40 backdrop-blur-md border border-white/10 rounded-full">
+                        <span class="relative flex h-2.5 w-2.5">
+                            <span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+                        </span>
+                        <span class="text-xs font-semibold text-white tracking-wide uppercase">AI Officer Active</span>
+                    </div>
+                </div>
+                <!-- Officer Name Tag -->
+                <div class="absolute bottom-4 left-4">
+                    <p class="text-white font-bold text-lg drop-shadow-md">Officer Sarah Jensen</p>
+                    <p class="text-gray-300 text-sm font-medium">U.S. Consulate Simulation</p>
+                </div>
+            </div>
+            <!-- Transcript Area -->
+            <div
+                class="flex-1 bg-white dark:bg-[#2a3441] rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col min-h-0 relative">
+                <div
+                    class="flex items-center justify-between px-5 py-3 border-b border-gray-100 dark:border-gray-600 bg-gray-50/50 dark:bg-gray-800/50 rounded-t-xl">
+                    <h3
+                        class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">forum</span>
+                        Live Transcript
+                    </h3>
+                    <span
+                        class="text-xs font-medium px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded border border-blue-100 dark:border-blue-800">English
+                        (US)</span>
+                </div>
+                <div class="flex-1 overflow-y-auto p-5 space-y-6 transcript-scrollbar">
+                    <!-- AI Message -->
+                    <div class="flex gap-4">
+                        <div class="size-10 rounded-full bg-cover bg-center shrink-0 border border-gray-200"
+                            data-alt="Avatar of Officer Sarah Jensen"
+                            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCxwI_TTLOgGDdy9pgtmWGbuyvLT9O_kU-4oYOP10T5Csgw2cgCuHBtsLUHAux97UQz73vcALwqDj4JMwXHy7IpPClO-IGPxZsu5UWT6PPleizNyDhfuYs9EVq8Ay36D1A0otyHIV3nrS55sZzGPqocZdCJH1gS7ZWkwPNSmq6puYpK-4lwRC5CjL5YsTx2KQpnc-w1hPETAz4vwpsqEZNoR3uLooS0KNar9dDMbgI8p-eh5Dk9mIQJ0vUHdW1QIieeuGySijyO1YZX");'>
+                        </div>
+                        <div class="flex flex-col gap-1 max-w-[85%]">
+                            <span class="text-xs font-bold text-gray-500 dark:text-gray-400">Officer Jensen</span>
+                            <p class="text-base text-[#121617] dark:text-gray-200 leading-relaxed">
+                                I see from your application that you've been working as a software engineer for two
+                                years. Why did you decide to pursue a Master's in Data Science at this specific
+                                university now?
+                            </p>
+                        </div>
+                    </div>
+                    <!-- User Message (Active) -->
+                    <div class="flex flex-row-reverse gap-4">
+                        <div
+                            class="size-10 rounded-full bg-primary text-white flex items-center justify-center shrink-0 font-bold shadow-sm">
+                            You
+                        </div>
+                        <div class="flex flex-col gap-1 items-end max-w-[85%]">
+                            <span class="text-xs font-bold text-gray-500 dark:text-gray-400">Speaking now...</span>
+                            <div
+                                class="p-4 bg-primary/5 dark:bg-primary/20 rounded-2xl rounded-tr-sm border border-primary/10 dark:border-primary/30">
+                                <p class="text-base text-[#121617] dark:text-white leading-relaxed">
+                                    Well, I looked at the curriculum and I was really impressed by the research
+                                    facilities available for data science students. Specifically, Professor Chen's work
+                                    in neural networks aligns perfectly with my career goals.
+                                    <span
+                                        class="animate-pulse inline-block w-1.5 h-4 bg-primary align-middle ml-1"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Right Column: Live Feedback Panel (5/12) -->
+        <div class="lg:col-span-5 flex flex-col h-full gap-4 min-h-0">
+            <div
+                class="bg-white dark:bg-[#2a3441] flex-1 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 overflow-y-auto transcript-scrollbar">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-[#121617] dark:text-white">Live Analysis</h3>
+                    <span
+                        class="flex items-center gap-1.5 text-xs font-bold text-white bg-red-500 px-2 py-1 rounded shadow-sm animate-pulse">
+                        <span class="size-2 bg-white rounded-full"></span> LIVE
+                    </span>
+                </div>
+                <!-- Metrics Grid -->
+                <div class="grid grid-cols-1 gap-4 mb-8">
+                    <!-- Clarity Metric -->
+                    <div
+                        class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span class="material-symbols-outlined text-6xl text-primary">graphic_eq</span>
+                        </div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span
+                                class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Speech
+                                Clarity</span>
+                            <span class="text-sm font-bold text-green-600 dark:text-green-400">Excellent</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 92%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Pace is steady at 130 wpm. Good enunciation.
+                        </p>
+                    </div>
+                    <!-- Confidence Metric -->
+                    <div
+                        class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span class="material-symbols-outlined text-6xl text-orange-500">psychology</span>
+                        </div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span
+                                class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Confidence</span>
+                            <span class="text-sm font-bold text-orange-500">Medium</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
+                            <div class="bg-orange-400 h-2 rounded-full" style="width: 65%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Detected 3 filler words ("um", "uh") in the
+                            last answer.</p>
+                    </div>
+                    <!-- Content Quality Metric -->
+                    <div
+                        class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span class="material-symbols-outlined text-6xl text-blue-500">check_circle</span>
+                        </div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span
+                                class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Content
+                                Match</span>
+                            <span class="text-sm font-bold text-primary dark:text-teal-400">Strong</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mt-2">
+                            <span
+                                class="inline-flex items-center gap-1 px-2 py-1 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 text-xs font-medium rounded border border-teal-100 dark:border-teal-800">
+                                <span class="material-symbols-outlined text-[14px]">check</span> Research
+                            </span>
+                            <span
+                                class="inline-flex items-center gap-1 px-2 py-1 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 text-xs font-medium rounded border border-teal-100 dark:border-teal-800">
+                                <span class="material-symbols-outlined text-[14px]">check</span> Curriculum
+                            </span>
+                            <span
+                                class="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-xs font-medium rounded border border-dashed border-gray-300 dark:border-gray-600 opacity-60">
+                                Career Plans
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Real-time Suggestions -->
+                <div>
+                    <h4 class="text-sm font-bold text-[#121617] dark:text-white mb-3 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-purple-500">auto_awesome</span>
+                        Real-time Suggestions
+                    </h4>
+                    <div class="space-y-3">
+                        <div
+                            class="flex gap-3 items-start p-3 rounded-lg bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30">
+                            <span
+                                class="material-symbols-outlined text-blue-600 dark:text-blue-400 shrink-0 mt-0.5 text-[20px]">visibility</span>
+                            <div>
+                                <p class="text-sm font-semibold text-blue-900 dark:text-blue-100">Eye Contact</p>
+                                <p class="text-xs text-blue-700 dark:text-blue-300 mt-1">Try to look at the camera
+                                    instead of the screen to simulate eye contact.</p>
+                            </div>
+                        </div>
+                        <div
+                            class="flex gap-3 items-start p-3 rounded-lg bg-orange-50/50 dark:bg-orange-900/10 border border-orange-100 dark:border-orange-800/30">
+                            <span
+                                class="material-symbols-outlined text-orange-600 dark:text-orange-400 shrink-0 mt-0.5 text-[20px]">speed</span>
+                            <div>
+                                <p class="text-sm font-semibold text-orange-900 dark:text-orange-100">Pacing Alert</p>
+                                <p class="text-xs text-orange-700 dark:text-orange-300 mt-1">You sped up slightly on the
+                                    last sentence. Take a breath before continuing.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Key Hints for this Question -->
+            <div class="bg-primary/5 dark:bg-primary/20 p-4 rounded-xl border border-primary/10 dark:border-primary/30">
+                <p class="text-xs font-bold text-primary dark:text-teal-200 uppercase tracking-wide mb-2">Hint: Question
+                    Focus</p>
+                <p class="text-sm text-[#121617] dark:text-gray-200">
+                    The officer is testing your specific intent. Avoid generic answers about the university's ranking.
+                    Mention specific labs, professors, or courses.
+                </p>
+            </div>
+        </div>
+    </main>
+    <!-- Bottom Control Bar -->
+    <div class="sticky bottom-6 mx-auto w-full max-w-[600px] z-30 px-6">
+        <div
+            class="bg-[#121617] dark:bg-black/80 backdrop-blur-lg text-white rounded-full shadow-2xl px-6 py-3 flex items-center justify-between border border-gray-700/50">
+            <!-- Mute Toggle -->
+            <button class="flex items-center gap-3 hover:bg-white/10 px-4 py-2 rounded-full transition-all group">
+                <div
+                    class="size-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
+                    <span class="material-symbols-outlined">mic</span>
+                </div>
+                <div class="flex flex-col items-start hidden sm:flex">
+                    <span class="text-sm font-bold">Microphone On</span>
+                    <span class="text-[10px] text-gray-400">Default - MacBook Pro</span>
+                </div>
+            </button>
+            <div class="h-8 w-px bg-gray-700 mx-2"></div>
+            <!-- Camera Toggle (Secondary) -->
+            <button
+                class="size-10 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors text-gray-300 hover:text-white">
+                <span class="material-symbols-outlined">videocam</span>
+            </button>
+            <!-- End Session -->
+            <button
+                class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-lg shadow-red-900/20 transition-all flex items-center gap-2 ml-2">
+                <span class="material-symbols-outlined text-[20px]">call_end</span>
+                End Session
+            </button>
+        </div>
+    </div>
+    
+</body>
+
+</html>
+

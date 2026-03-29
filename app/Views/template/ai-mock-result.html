@@ -1,0 +1,575 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Mock Interview Analysis &amp; Feedback</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
+    <script src="https://unpkg.com/heroicons@2.1.5/outline/index.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#012169",          // Brand navy blue
+                        "primary-hover": "#023a8f",    // Lighter navy for hover
+                        "primary-soft": "#e6ebf4",     // Soft blue background
+
+                        "background-light": "#f8fafc", // Cool light background
+                        "background-dark": "#0c1424",  // Dark navy background
+
+                        "card-light": "#ffffff",
+                        "card-dark": "#121a2f",        // Dark card with blue tone
+
+                        "text-main": "#0b1220",        // Deep readable text
+                        "text-muted": "#5b6b8a",       // Muted blue-gray text
+
+                        "border-light": "#dbe2ef",
+                        "border-dark": "#1e2a44",
+
+                        "success": "#1b9c85",
+                        "warning": "#f0b429",
+                        "danger": "#d64545",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    boxShadow: {
+                        "soft": "0 4px 20px -2px rgba(14, 117, 129, 0.08)",
+                        "card": "0 2px 8px -1px rgba(0, 0, 0, 0.05)",
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <script>
+        // Check local time (Day: 6 AM - 6 PM)
+        const hours = new Date().getHours();
+        const isDayTime = hours >= 6 && hours < 18;
+        
+        // Check storage or default to time-based
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && !isDayTime)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-[#111816] font-display antialiased min-h-screen flex flex-col">
+    <!-- Top Navigation -->
+    <nav
+        class="sticky top-0 z-50 w-full bg-card-light/90 dark:bg-card-dark/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-3">
+                    <img 
+                        src="https://unihunt.org/public/assets/img/logo.webp" 
+                        alt="UniHunt Logo"
+                        class="h-8 w-auto"
+                    />
+                </a>
+                <!-- Desktop Links -->
+                <div class="hidden md:flex items-center gap-8">
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="university.html">Universities</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="course.html">Courses</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="#">AI Tools</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="blog.html">Blog</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="#">Accommodation</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="contact.html">Contact Us</a>
+                </div>
+                <!-- CTA Buttons -->
+                <div class="hidden md:flex items-center gap-3">
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleTheme()" 
+                        class="p-2 mr-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-text-main dark:text-white" 
+                        aria-label="Toggle Dark Mode">
+                        <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+                        <span class="material-symbols-outlined hidden dark:block">light_mode</span>
+                    </button>
+                    <a href="forget.html"
+                        class="px-4 py-2 text-sm font-bold text-text-main bg-background-light hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 rounded-lg transition-colors">
+                        Sign In
+                    </a>
+                    <button
+                        class="px-4 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-hover rounded-lg shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
+                        Get Started
+                    </button>
+                </div>
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button class="text-text-main dark:text-white p-2">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <!-- Breadcrumbs -->
+        <nav aria-label="Breadcrumb" class="flex mb-6">
+            <ol class="inline-flex items-center space-x-2">
+                <li>
+                    <a class="text-gray-500 hover:text-primary text-sm font-medium" href="#">Dashboard</a>
+                </li>
+                <li><span class="text-gray-400 text-sm">/</span></li>
+                <li>
+                    <a class="text-gray-500 hover:text-primary text-sm font-medium" href="#">Mock Interviews</a>
+                </li>
+                <li><span class="text-gray-400 text-sm">/</span></li>
+                <li aria-current="page">
+                    <span class="text-primary text-sm font-medium">Analysis #4</span>
+                </li>
+            </ol>
+        </nav>
+        <!-- Page Header -->
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
+            <div class="space-y-2">
+                <h1 class="text-3xl md:text-4xl font-extrabold text-[#111816] dark:text-white tracking-tight">Interview
+                    Analysis: F-1 Visa Mock</h1>
+                <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                    <span class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                        Oct 24, 2023
+                    </span>
+                    <span class="w-1 h-1 bg-gray-400 rounded-full"></span>
+                    <span class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[18px]">schedule</span>
+                        Duration: 15m 30s
+                    </span>
+                    <span class="w-1 h-1 bg-gray-400 rounded-full"></span>
+                    <span
+                        class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold border border-blue-100">US
+                        Visa Category</span>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <button
+                    class="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow text-sm font-semibold text-[#111816] dark:text-white transition-all">
+                    <span class="material-symbols-outlined text-[20px]">play_circle</span>
+                    Watch Replay
+                </button>
+                <button
+                    class="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow text-sm font-semibold text-[#111816] dark:text-white transition-all">
+                    <span class="material-symbols-outlined text-[20px]">download</span>
+                    Export PDF
+                </button>
+            </div>
+        </div>
+        <!-- Dashboard Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- LEFT COLUMN: Detailed Q&A Analysis (8 Cols) -->
+            <div class="lg:col-span-8 space-y-6">
+                <h2 class="text-xl font-bold text-[#111816] dark:text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">graphic_eq</span>
+                    Question Analysis
+                </h2>
+                <!-- Question Card 1: Good Response -->
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-lg font-bold text-[#111816] dark:text-white leading-tight">1. Why did you choose
+                            this specific university?</h3>
+                        <span
+                            class="shrink-0 px-2.5 py-1 rounded-full bg-green-50 text-green-700 text-xs font-bold border border-green-100 flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">check_circle</span> Good
+                        </span>
+                    </div>
+                    <!-- User Answer Block -->
+                    <div class="mb-6 relative group">
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-gray-200 rounded-l-lg"></div>
+                        <div class="pl-4">
+                            <p
+                                class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                Your Answer
+                                <span class="text-gray-300">|</span>
+                                <span class="material-symbols-outlined text-[16px] text-gray-400">timer</span> 0:45s
+                            </p>
+                            <p class="text-gray-700 dark:text-gray-300 text-base leading-relaxed">
+                                "I chose the University of Washington because it has a really big campus and I like the
+                                location in Seattle. Also, the computer science program is very famous, and I think it
+                                will be good for my future career."
+                            </p>
+                            <!-- Audio Player Placeholder -->
+                            <div
+                                class="mt-3 flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-2 max-w-sm border border-gray-100 dark:border-gray-600">
+                                <button
+                                    class="size-8 flex items-center justify-center bg-white dark:bg-gray-600 rounded-full shadow-sm text-primary hover:text-primary/80">
+                                    <span class="material-symbols-outlined text-[20px] fill-current">play_arrow</span>
+                                </button>
+                                <div class="flex-1 h-8 flex items-center gap-0.5 opacity-50">
+                                    <div class="w-1 h-3 bg-primary rounded-full"></div>
+                                    <div class="w-1 h-5 bg-primary rounded-full"></div>
+                                    <div class="w-1 h-4 bg-primary rounded-full"></div>
+                                    <div class="w-1 h-6 bg-primary rounded-full"></div>
+                                    <div class="w-1 h-3 bg-primary rounded-full"></div>
+                                    <div class="w-1 h-4 bg-primary rounded-full"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- AI Analysis Block -->
+                    <div class="bg-primary/5 rounded-lg p-5 border border-primary/10 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                            <span class="material-symbols-outlined text-6xl text-primary">auto_awesome</span>
+                        </div>
+                        <div class="relative z-10">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="material-symbols-outlined text-primary text-[18px]">psychology</span>
+                                <p class="text-xs font-bold text-primary uppercase tracking-wider">AI Insight &amp;
+                                    Better Answer</p>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                                <strong class="text-gray-900 dark:text-white">Critique:</strong> Your answer is generic.
+                                Officers want to hear about specific academic fit, not just location or fame.
+                            </p>
+                            <div class="bg-white dark:bg-gray-800 p-4 rounded border border-primary/20 shadow-sm">
+                                <p class="text-gray-800 dark:text-gray-200 text-base leading-relaxed">
+                                    "I selected the University of Washington specifically for its <span
+                                        class="bg-green-100 text-green-800 px-1 rounded">Human-Computer Interaction
+                                        research lab</span> led by Professor X. This aligns perfectly with my goal to
+                                    specialize in accessible UX design, which isn't available at universities in my home
+                                    country."
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Question Card 2: Needs Improvement -->
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border-l-4 border-l-orange-500 border-y border-r border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-lg font-bold text-[#111816] dark:text-white leading-tight">2. How will you fund
+                            your education?</h3>
+                        <span
+                            class="shrink-0 px-2.5 py-1 rounded-full bg-orange-50 text-orange-700 text-xs font-bold border border-orange-100 flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">warning</span> Weak
+                        </span>
+                    </div>
+                    <div class="mb-6 pl-4 border-l border-gray-200 dark:border-gray-700">
+                        <p
+                            class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                            Your Answer
+                            <span class="text-gray-300">|</span>
+                            <span class="material-symbols-outlined text-[16px] text-gray-400">timer</span> 0:22s
+                        </p>
+                        <p class="text-gray-700 dark:text-gray-300 text-base leading-relaxed">
+                            "My father will pay for everything. He has a business. It is a good business, so money is
+                            not a problem for us."
+                        </p>
+                    </div>
+                    <div
+                        class="bg-orange-50/50 dark:bg-orange-900/10 rounded-lg p-5 border border-orange-100 dark:border-orange-800/30">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="material-symbols-outlined text-orange-600 text-[18px]">lightbulb</span>
+                            <p class="text-xs font-bold text-orange-700 dark:text-orange-400 uppercase tracking-wider">
+                                Improvement Needed</p>
+                        </div>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                            <strong class="text-gray-900 dark:text-white">Why it failed:</strong> "Business" is too
+                            vague. You need to specify income sources and liquid assets.
+                        </p>
+                        <div
+                            class="bg-white dark:bg-gray-800 p-4 rounded border border-orange-200 dark:border-orange-800/30 shadow-sm">
+                            <p class="text-gray-800 dark:text-gray-200 text-base leading-relaxed">
+                                "My education is fully sponsored by my father, who owns a <span
+                                    class="bg-green-100 text-green-800 px-1 rounded">textile manufacturing firm</span>
+                                with an annual turnover of $150,000. We have saved <span
+                                    class="bg-green-100 text-green-800 px-1 rounded">$60,000 in liquid assets</span>
+                                specifically for my first year, as shown in these bank statements."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Question Card 3 -->
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow opacity-90">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-lg font-bold text-[#111816] dark:text-white leading-tight">3. Do you plan to
+                            return home after graduation?</h3>
+                        <span
+                            class="shrink-0 px-2.5 py-1 rounded-full bg-green-50 text-green-700 text-xs font-bold border border-green-100 flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">check_circle</span> Good
+                        </span>
+                    </div>
+                    <div class="pl-4 border-l border-gray-200 dark:border-gray-700">
+                        <p class="text-gray-700 dark:text-gray-300 text-base leading-relaxed line-clamp-2">
+                            "Yes, absolutely. My family has property here and my long term goal is to take over the
+                            family business..."
+                        </p>
+                        <button class="mt-2 text-primary text-sm font-bold hover:underline">Show full analysis</button>
+                    </div>
+                </div>
+            </div>
+            <!-- RIGHT COLUMN: Sidebar Stats & Score (4 Cols) -->
+            <div class="lg:col-span-4 space-y-6">
+                <!-- Score Card -->
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-100 dark:border-gray-700 text-center relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-teal-400 to-primary">
+                    </div>
+                    <h2 class="text-lg font-bold text-gray-500 uppercase tracking-wide mb-6">Overall Score</h2>
+                    <div class="relative size-40 mx-auto mb-6">
+                        <svg class="size-full -rotate-90" viewbox="0 0 36 36">
+                            <!-- Background Circle -->
+                            <path class="text-gray-100 dark:text-gray-700"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                fill="none" stroke="currentColor" stroke-width="2.5"></path>
+                            <!-- Progress Circle (82%) -->
+                            <path class="text-primary drop-shadow-lg"
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                fill="none" stroke="currentColor" stroke-dasharray="82, 100" stroke-linecap="round"
+                                stroke-width="2.5"></path>
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span class="text-4xl font-black text-[#111816] dark:text-white tracking-tight">82</span>
+                            <span class="text-xs font-semibold text-gray-400 uppercase">out of 100</span>
+                        </div>
+                    </div>
+                    <div class="inline-block px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-bold mb-6">
+                        Passing Potential
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 text-left border-t border-gray-100 dark:border-gray-700 pt-5">
+                        <div>
+                            <p class="text-xs text-gray-400 font-semibold uppercase mb-2">Strengths</p>
+                            <ul class="space-y-1">
+                                <li class="flex items-start gap-1.5 text-sm text-gray-700 dark:text-gray-300">
+                                    <span
+                                        class="material-symbols-outlined text-green-500 text-[16px] mt-0.5">check</span>
+                                    Strong Ties
+                                </li>
+                                <li class="flex items-start gap-1.5 text-sm text-gray-700 dark:text-gray-300">
+                                    <span
+                                        class="material-symbols-outlined text-green-500 text-[16px] mt-0.5">check</span>
+                                    Confidence
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400 font-semibold uppercase mb-2">Weaknesses</p>
+                            <ul class="space-y-1">
+                                <li class="flex items-start gap-1.5 text-sm text-gray-700 dark:text-gray-300">
+                                    <span
+                                        class="material-symbols-outlined text-red-500 text-[16px] mt-0.5">priority_high</span>
+                                    Financials
+                                </li>
+                                <li class="flex items-start gap-1.5 text-sm text-gray-700 dark:text-gray-300">
+                                    <span
+                                        class="material-symbols-outlined text-red-500 text-[16px] mt-0.5">priority_high</span>
+                                    Specificity
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- Metrics Grid -->
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Pace -->
+                    <div
+                        class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                        <div class="flex items-center gap-2 mb-1 text-gray-500">
+                            <span class="material-symbols-outlined text-[18px]">speed</span>
+                            <span class="text-xs font-bold uppercase">Pace</span>
+                        </div>
+                        <p class="text-2xl font-bold text-[#111816] dark:text-white">125 <span
+                                class="text-sm font-medium text-gray-400">wpm</span></p>
+                        <p class="text-xs text-green-600 font-medium mt-1">+5% improved</p>
+                    </div>
+                    <!-- Fillers -->
+                    <div
+                        class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                        <div class="flex items-center gap-2 mb-1 text-gray-500">
+                            <span class="material-symbols-outlined text-[18px]">graphic_eq</span>
+                            <span class="text-xs font-bold uppercase">Fillers</span>
+                        </div>
+                        <p class="text-2xl font-bold text-[#111816] dark:text-white">&lt;2% <span
+                                class="text-sm font-medium text-gray-400">freq</span></p>
+                        <p class="text-xs text-green-600 font-medium mt-1">Excellent</p>
+                    </div>
+                    <!-- Eye Contact (Mock) -->
+                    <div
+                        class="col-span-2 bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm flex items-center justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1 text-gray-500">
+                                <span class="material-symbols-outlined text-[18px]">visibility</span>
+                                <span class="text-xs font-bold uppercase">Eye Contact</span>
+                            </div>
+                            <p class="text-lg font-bold text-[#111816] dark:text-white">Consistent</p>
+                        </div>
+                        <div class="h-10 w-24 bg-gray-50 dark:bg-gray-700 rounded overflow-hidden flex items-end gap-1 px-1 pb-1"
+                            data-alt="Small bar chart showing eye contact consistency">
+                            <div class="w-1/5 h-[60%] bg-primary/40 rounded-sm"></div>
+                            <div class="w-1/5 h-[80%] bg-primary/60 rounded-sm"></div>
+                            <div class="w-1/5 h-[100%] bg-primary rounded-sm"></div>
+                            <div class="w-1/5 h-[90%] bg-primary/80 rounded-sm"></div>
+                            <div class="w-1/5 h-[70%] bg-primary/50 rounded-sm"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Call to Action -->
+                <div
+                    class="bg-primary rounded-xl p-6 text-white shadow-lg shadow-primary/20 relative overflow-hidden group">
+                    <div
+                        class="absolute -right-10 -top-10 size-40 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all">
+                    </div>
+                    <h3 class="text-lg font-bold mb-2 relative z-10">Ready to improve?</h3>
+                    <p class="text-primary-100 text-sm mb-6 relative z-10 opacity-90">Book your next AI session to focus
+                        on financial questions.</p>
+                    <button
+                        class="w-full py-3 px-4 bg-white text-primary font-bold rounded-lg shadow-sm hover:bg-gray-50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 relative z-10">
+                        <span class="material-symbols-outlined text-[20px]">calendar_add_on</span>
+                        Schedule Next Practice
+                    </button>
+                </div>
+                <!-- Helpful Resource -->
+                <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800/50">
+                    <p class="text-xs font-bold text-gray-500 uppercase mb-3">Recommended Reading</p>
+                    <a class="flex items-start gap-3 group" href="#">
+                        <div class="size-12 rounded bg-gray-200 overflow-hidden shrink-0"
+                            data-alt="Thumbnail of a guide book cover about financial documents">
+                            <img alt="Financial Guide"
+                                class="size-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4SEPmpwBKqbNnR47jpHHx-sTBEAfK224pnDP1nqZarDY9OXrqu_4V5hV23sfVWV6ZiFD13zFCbIjqcIkhFVs3CIUQ47f7uPD7IUIRkXdH-sqpkxAOgYfnlqanJdna3wnfO87O5dIDcXj418mNvBlGSoIFFx7lagIrw1yijmsRvs-uwcv5TuDb5cr2Qy6Hcp-WdrF9t-eKUXleuiYDClN5jAr8f6owkPH2YwobgJ0EEaZ-WwOUCffS2bC8SfGLPebBGCN2CJkWkJOQ" />
+                        </div>
+                        <div>
+                            <h4
+                                class="text-sm font-bold text-[#111816] dark:text-white group-hover:text-primary transition-colors">
+                                Mastering Financial Proofs for F-1 Visa</h4>
+                            <p class="text-xs text-gray-500 mt-1">5 min read</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-card-dark border-t border-gray-100 dark:border-gray-800 pt-16 pb-8">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
+                <div class="col-span-2 lg:col-span-2 pr-8">
+                    <div class="flex items-center gap-2 mb-4">
+                        <img src="https://unihunt.org/public/assets/images/favicon_io/favicon.ico" class="w-8 h-8" alt="" srcset="">
+                        <span class="text-xl font-bold tracking-tight">
+                            <span class="text-secondary dark:text-secondary">UNI</span>
+                            <span class="text-primary dark:text-primary">HUNT</span>
+                        </span>
+                    </div>
+                    <p class="text-text-muted text-sm leading-relaxed mb-6 max-w-xs">
+                        Unihunt Course Finder helps students discover the best courses and universities worldwide. With
+                        an easy-to-use interface, it provides detailed course information, admission requirements, and
+                        tuition fees. Find your ideal program quickly and efficiently, making your study abroad journey
+                        smoother and hassle-free.
+                    </p>
+                    <div class="flex gap-4">
+                        <a class="text-gray-400 hover:text-primary transition-colors" href="#"><span
+                                class="sr-only">Twitter</span>
+                            <svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewbox="0 0 24 24">
+                                <path
+                                    d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84">
+                                </path>
+                            </svg>
+                        </a>
+                        <a class="text-gray-400 hover:text-primary transition-colors" href="#"><span
+                                class="sr-only">LinkedIn</span>
+                            <svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewbox="0 0 24 24">
+                                <path clip-rule="evenodd"
+                                    d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+                                    fill-rule="evenodd"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="font-bold text-text-main dark:text-white mb-4">Platform</h3>
+                    <ul class="space-y-3 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="#">Browse Universities</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Courses</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Scholarships</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Events</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-text-main dark:text-white mb-4">Resources</h3>
+                    <ul class="space-y-3 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="#">Blog</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">SOP Generator</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Resume Builder</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Student Guides</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-text-main dark:text-white mb-4">Company</h3>
+                    <ul class="space-y-3 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="#">About Us</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Careers</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Partner with us</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div
+                class="border-t border-gray-100 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-text-muted">
+                <p>Â© 2026 UniHunt Inc. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a class="hover:text-text-main transition-colors" href="#">Privacy Policy</a>
+                    <a class="hover:text-text-main transition-colors" href="#">Terms of Service</a>
+                    <a class="hover:text-text-main transition-colors" href="#">Cookie Settings</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
+

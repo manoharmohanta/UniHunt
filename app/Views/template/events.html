@@ -1,0 +1,804 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Upcoming Education Events Directory</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
+    <script src="https://unpkg.com/heroicons@2.1.5/outline/index.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#012169",          // Brand navy blue
+                        "primary-hover": "#023a8f",    // Lighter navy for hover
+                        "primary-soft": "#e6ebf4",     // Soft blue background
+
+                        "background-light": "#f8fafc", // Cool light background
+                        "background-dark": "#0c1424",  // Dark navy background
+
+                        "card-light": "#ffffff",
+                        "card-dark": "#121a2f",        // Dark card with blue tone
+
+                        "text-main": "#0b1220",        // Deep readable text
+                        "text-muted": "#5b6b8a",       // Muted blue-gray text
+
+                        "border-light": "#dbe2ef",
+                        "border-dark": "#1e2a44",
+
+                        "success": "#1b9c85",
+                        "warning": "#f0b429",
+                        "danger": "#d64545",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    boxShadow: {
+                        "soft": "0 4px 20px -2px rgba(14, 117, 129, 0.08)",
+                        "card": "0 2px 8px -1px rgba(0, 0, 0, 0.05)",
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <script>
+        // Check local time (Day: 6 AM - 6 PM)
+        const hours = new Date().getHours();
+        const isDayTime = hours >= 6 && hours < 18;
+        
+        // Check storage or default to time-based
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && !isDayTime)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        }
+    </script>
+<style>
+        /* Custom scrollbar hiding for clean UI */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-text-main dark:text-gray-100 transition-colors duration-200">
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+        <!-- Top Navigation -->
+        <nav
+            class="sticky top-0 z-50 w-full bg-card-light/90 dark:bg-card-dark/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <!-- Logo -->
+                    <a href="index.html" class="flex items-center gap-3">
+                        <img 
+                            src="https://unihunt.org/public/assets/img/logo.webp" 
+                            alt="UniHunt Logo"
+                            class="h-8 w-auto"
+                        />
+                    </a>
+                    <!-- Desktop Links -->
+                    <div class="hidden md:flex items-center gap-8">
+                        <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                            href="university.html">Universities</a>
+                        <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                            href="course.html">Courses</a>
+                        <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                            href="#">AI Tools</a>
+                        <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                            href="blog.html">Blog</a>
+                        <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                            href="#">Accommodation</a>
+                        <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                            href="contact.html">Contact Us</a>
+                    </div>
+                    <!-- CTA Buttons -->
+                    <div class="hidden md:flex items-center gap-3">
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleTheme()" 
+                        class="p-2 mr-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-text-main dark:text-white" 
+                        aria-label="Toggle Dark Mode">
+                        <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+                        <span class="material-symbols-outlined hidden dark:block">light_mode</span>
+                    </button>
+                        <a href="forget.html"
+                            class="px-4 py-2 text-sm font-bold text-text-main bg-background-light hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 rounded-lg transition-colors">
+                            Sign In
+                        </a>
+                        <button
+                            class="px-4 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-hover rounded-lg shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
+                            Get Started
+                        </button>
+                    </div>
+                    <!-- Mobile Menu Button -->
+                    <div class="md:hidden flex items-center">
+                        <button class="text-text-main dark:text-white p-2">
+                            <span class="material-symbols-outlined">menu</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <main class="flex-1 w-full max-w-[1440px] mx-auto px-4 md:px-8 lg:px-16 py-6 md:py-10">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap gap-2 mb-6">
+                <a class="text-text-sub dark:text-gray-400 hover:text-primary text-sm font-medium leading-normal transition-colors"
+                    href="#">Home</a>
+                <span class="text-text-sub dark:text-gray-500 text-sm font-medium leading-normal">/</span>
+                <span class="text-text-main dark:text-white text-sm font-medium leading-normal">Events Directory</span>
+            </div>
+            <!-- Page Heading -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-10">
+                <div class="flex flex-col gap-2 max-w-2xl">
+                    <h1
+                        class="text-[#101818] dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.02em]">
+                        Upcoming Education Events</h1>
+                    <p class="text-text-sub dark:text-gray-400 text-base md:text-lg font-normal leading-relaxed">
+                        Discover webinars, fairs, and info sessions from top global universities. Connect with
+                        admissions officers and alumni.</p>
+                </div>
+                <div class="hidden md:flex gap-2">
+                    <button
+                        class="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-gray-700 text-sm font-medium hover:border-primary transition-colors shadow-sm">
+                        <span class="material-symbols-outlined text-[20px]">calendar_month</span>
+                        Calendar View
+                    </button>
+                </div>
+            </div>
+            <!-- Featured Carousel Section -->
+            <section class="mb-12">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="material-symbols-outlined text-primary text-[20px]">star</span>
+                    <h3 class="text-lg font-bold text-[#101818] dark:text-white">Featured This Month</h3>
+                </div>
+                <!-- Scroll Container -->
+                <div class="flex overflow-x-auto gap-4 pb-4 no-scrollbar snap-x snap-mandatory">
+                    <!-- Featured Card 1 -->
+                    <div
+                        class="snap-center shrink-0 w-[85vw] md:w-[600px] h-[320px] relative rounded-xl overflow-hidden group cursor-pointer shadow-lg">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                            data-alt="Students gathered in a grand university hall library"
+                            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBDSv59P_CH0GljPmBNMpS5ABjEuEG8_3hgkttxVjQUIOi5cKZJO1qkExtMGJyBfVGC-bEAjs4nLgWzEFPY5yPjpisIEZsj_Q0BhxXKgmy4oz6dRNcOBmPcTXuzsNrMsXvd3eyesq8s26VRUvQkjv_RTIB8ptsZ8KxtFmLkGVk954n1bwmJQ9MAb5y8aDQVGh6VqhzuCluky5w1YUsqEaOridxHdRaB3rP7LkhREiiKvFkC13XlRvTQ53XqfcxADIo61_ZeytD2AEFp");'>
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                        <div
+                            class="absolute top-4 left-4 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                            Premium Event</div>
+                        <div class="absolute bottom-0 left-0 p-6 w-full md:w-3/4">
+                            <p class="text-primary text-sm font-bold mb-1">Nov 15 â€¢ London, UK</p>
+                            <h3 class="text-white text-2xl md:text-3xl font-bold mb-2">Global Education Summit 2024</h3>
+                            <p class="text-gray-200 text-sm md:text-base line-clamp-2 mb-4">The largest gathering of
+                                international universities in Europe. Meet representatives from over 50 top-tier
+                                institutions.</p>
+                            <button
+                                class="bg-white text-[#101818] hover:bg-gray-100 px-5 py-2 rounded-lg text-sm font-bold transition-colors">Reserve
+                                Your Spot</button>
+                        </div>
+                    </div>
+                    <!-- Featured Card 2 -->
+                    <div
+                        class="snap-center shrink-0 w-[85vw] md:w-[400px] h-[320px] relative rounded-xl overflow-hidden group cursor-pointer shadow-md">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                            data-alt="Diverse group of students discussing in a modern classroom workshop"
+                            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAKsNhI2Sy0v3V0rcdOPLsrRVh3bFtwBCrTvK2L5DeHVk6NYElYC-5QGwxui-nAHC7KhZ2WxJX4h0HTIMjNAoN8jEbFXQ7fjAexNMeFSlo5D8QLDwnM4TD_egpmnKhVZ-dsMlxMwiV34KRZ4QeEQaAngvpzYCvVdJkUvrlfCmaoknRTslSOHWGD-NyJGXHqGVUL-d5ZQQPPdiBF2-9flTs2guMPgkS1vlA_K3ipgoPGprvZ4p1EvomfN-zb1ITQ_wTm8mazDBFPkcBY");'>
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+                        <div
+                            class="absolute top-4 left-4 bg-white/20 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                            Webinar</div>
+                        <div class="absolute bottom-0 left-0 p-6">
+                            <p class="text-primary text-sm font-bold mb-1">Oct 24 â€¢ Online</p>
+                            <h3 class="text-white text-xl font-bold mb-2">Study in Canada Workshop</h3>
+                            <p class="text-gray-300 text-sm line-clamp-2 mb-4">Comprehensive guide to visas,
+                                scholarships, and campus life.</p>
+                            <button
+                                class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors">Register
+                                Free</button>
+                        </div>
+                    </div>
+                    <!-- Featured Card 3 -->
+                    <div
+                        class="snap-center shrink-0 w-[85vw] md:w-[400px] h-[320px] relative rounded-xl overflow-hidden group cursor-pointer shadow-md">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                            data-alt="Historic university building campus exterior with green lawn"
+                            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAiks-um9ngjO-ibvobKig7eASyT4PN-mkOnhfOgS3vqwAtPMUKIreChvHcmXyd-UvteoTCY3wjreiaeddcHPmtKVPRUw-eMmacTTOR2iebeV1yTK5pUy9GS6Tz3EbiZbyPQPd_e6QcCuH-Aq2BKMt49V6aF8ZzIs7U8a-qKAGpkvANnGxDIzuIJiThqKqVuY2BrzcxZRuD3OwC7QQP28i3126OzTGkugWJAXug03z_HpbrTfPP3vX6O7j4iR8vFqrLWHkIigFYnYQg");'>
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+                        <div
+                            class="absolute top-4 left-4 bg-white/20 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                            Campus Tour</div>
+                        <div class="absolute bottom-0 left-0 p-6">
+                            <p class="text-primary text-sm font-bold mb-1">Nov 02 â€¢ Cambridge, MA</p>
+                            <h3 class="text-white text-xl font-bold mb-2">Harvard Admissions Q&amp;A</h3>
+                            <p class="text-gray-300 text-sm line-clamp-2 mb-4">Direct access to admissions officers. Ask
+                                your questions live.</p>
+                            <button
+                                class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors">Get
+                                Tickets</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Main Content Area: Sidebar + Grid -->
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Sidebar Filters -->
+                <aside class="w-full lg:w-64 flex-shrink-0 space-y-6">
+                    <!-- Mobile Filter Toggle (Visible only on small screens) -->
+                    <div
+                        class="lg:hidden flex justify-between items-center p-4 bg-surface-light dark:bg-surface-dark rounded-lg border border-gray-200 dark:border-gray-700">
+                        <span class="font-bold text-[#101818] dark:text-white">Filters</span>
+                        <span class="material-symbols-outlined">filter_list</span>
+                    </div>
+                    <!-- Filter Groups (Desktop) -->
+                    <div class="hidden lg:block space-y-8">
+                        <div>
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-[#101818] dark:text-white text-sm uppercase tracking-wider">
+                                    Event Type</h3>
+                            </div>
+                            <div class="space-y-3">
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input checked=""
+                                        class="form-checkbox size-4 rounded border-gray-300 text-primary focus:ring-primary bg-transparent"
+                                        type="checkbox" />
+                                    <span
+                                        class="text-sm text-gray-600 dark:text-gray-400 group-hover:text-primary transition-colors">All
+                                        Events</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input
+                                        class="form-checkbox size-4 rounded border-gray-300 text-primary focus:ring-primary bg-transparent"
+                                        type="checkbox" />
+                                    <span
+                                        class="text-sm text-gray-600 dark:text-gray-400 group-hover:text-primary transition-colors">Online
+                                        / Webinar</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input
+                                        class="form-checkbox size-4 rounded border-gray-300 text-primary focus:ring-primary bg-transparent"
+                                        type="checkbox" />
+                                    <span
+                                        class="text-sm text-gray-600 dark:text-gray-400 group-hover:text-primary transition-colors">In-Person
+                                        Fair</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input
+                                        class="form-checkbox size-4 rounded border-gray-300 text-primary focus:ring-primary bg-transparent"
+                                        type="checkbox" />
+                                    <span
+                                        class="text-sm text-gray-600 dark:text-gray-400 group-hover:text-primary transition-colors">Campus
+                                        Tour</span>
+                                </label>
+                            </div>
+                        </div>
+                        <hr class="border-gray-200 dark:border-gray-700" />
+                        <div>
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-[#101818] dark:text-white text-sm uppercase tracking-wider">
+                                    Region</h3>
+                            </div>
+                            <div class="space-y-3">
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input
+                                        class="form-checkbox size-4 rounded border-gray-300 text-primary focus:ring-primary bg-transparent"
+                                        type="checkbox" />
+                                    <span
+                                        class="text-sm text-gray-600 dark:text-gray-400 group-hover:text-primary transition-colors">North
+                                        America</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input
+                                        class="form-checkbox size-4 rounded border-gray-300 text-primary focus:ring-primary bg-transparent"
+                                        type="checkbox" />
+                                    <span
+                                        class="text-sm text-gray-600 dark:text-gray-400 group-hover:text-primary transition-colors">Europe</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input
+                                        class="form-checkbox size-4 rounded border-gray-300 text-primary focus:ring-primary bg-transparent"
+                                        type="checkbox" />
+                                    <span
+                                        class="text-sm text-gray-600 dark:text-gray-400 group-hover:text-primary transition-colors">Asia
+                                        Pacific</span>
+                                </label>
+                            </div>
+                        </div>
+                        <hr class="border-gray-200 dark:border-gray-700" />
+                        <div>
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-[#101818] dark:text-white text-sm uppercase tracking-wider">
+                                    Topic</h3>
+                            </div>
+                            <div class="space-y-3">
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input
+                                        class="form-checkbox size-4 rounded border-gray-300 text-primary focus:ring-primary bg-transparent"
+                                        type="checkbox" />
+                                    <span
+                                        class="text-sm text-gray-600 dark:text-gray-400 group-hover:text-primary transition-colors">STEM
+                                        &amp; Engineering</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input
+                                        class="form-checkbox size-4 rounded border-gray-300 text-primary focus:ring-primary bg-transparent"
+                                        type="checkbox" />
+                                    <span
+                                        class="text-sm text-gray-600 dark:text-gray-400 group-hover:text-primary transition-colors">Business
+                                        &amp; MBA</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input
+                                        class="form-checkbox size-4 rounded border-gray-300 text-primary focus:ring-primary bg-transparent"
+                                        type="checkbox" />
+                                    <span
+                                        class="text-sm text-gray-600 dark:text-gray-400 group-hover:text-primary transition-colors">Arts
+                                        &amp; Humanities</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+                <!-- Main Grid Column -->
+                <div class="flex-1">
+                    <!-- Search Bar Area -->
+                    <div class="mb-8">
+                        <label class="flex flex-col h-12 w-full">
+                            <div
+                                class="flex w-full items-stretch rounded-lg h-full shadow-sm bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-gray-700 focus-within:ring-2 focus-within:ring-primary focus-within:border-primary transition-shadow">
+                                <div
+                                    class="text-text-sub dark:text-gray-400 flex items-center justify-center pl-4 pr-2">
+                                    <span class="material-symbols-outlined">search</span>
+                                </div>
+                                <input
+                                    class="flex w-full flex-1 rounded-lg text-text-main dark:text-white bg-transparent border-none focus:ring-0 h-full placeholder:text-text-sub dark:placeholder:text-gray-500 px-2 text-base font-normal leading-normal"
+                                    placeholder="Search for events, universities, or topics..." />
+                                <div class="hidden sm:flex items-center pr-2">
+                                    <button
+                                        class="text-xs font-bold text-primary bg-primary/10 hover:bg-primary/20 px-3 py-1.5 rounded transition-colors">SEARCH</button>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <!-- Events Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Event Card 1 -->
+                        <div
+                            class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-800 hover:-translate-y-1">
+                            <div class="relative h-48 bg-cover bg-center"
+                                data-alt="People collaborating around a laptop in a bright office"
+                                style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDX6lMA0h82dNUq8Q3hEdFKQDA6crRKXOyiIhfTO4snKMGnq_vqdazR233RQF4slMvdj2Oln-Q2ayqAbqJ-s6vj-dqrb3-j4cIxHCiRHXtajCmnhDavIBYrO9k9lpgD4KpUS5lsLIMe3oCXAnLkAaqP56AOCa1CQ2z8936r00ZJSQIk-YBy0MiQhWlBm0QCjnGbXscrcaxUO3yxoWLcbpO2vvgrQISDOH-4h3ZUB7yxohVtl3XpyPwvWHIQ8HnP5tI34wpsoMC7_YRY");'>
+                                <div class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors">
+                                </div>
+                                <div
+                                    class="absolute top-3 left-3 bg-white dark:bg-[#242a30] rounded-lg px-2.5 py-1.5 flex flex-col items-center shadow-md border border-gray-100 dark:border-gray-700">
+                                    <span class="text-[10px] font-bold text-primary uppercase tracking-wide">OCT</span>
+                                    <span
+                                        class="text-xl font-black text-[#101818] dark:text-white leading-none">24</span>
+                                </div>
+                                <div class="absolute top-3 right-3">
+                                    <button
+                                        class="bg-white/90 dark:bg-black/60 backdrop-blur-sm p-1.5 rounded-full hover:text-red-500 text-gray-400 transition-colors">
+                                        <span class="material-symbols-outlined text-[18px]">favorite</span>
+                                    </button>
+                                </div>
+                                <div class="absolute bottom-3 left-3">
+                                    <span
+                                        class="bg-emerald-500/90 text-white text-[10px] font-bold px-2 py-1 rounded backdrop-blur-sm shadow-sm uppercase tracking-wide">Online</span>
+                                </div>
+                            </div>
+                            <div class="p-5 flex flex-col gap-3 flex-1">
+                                <div class="flex flex-col gap-1">
+                                    <p
+                                        class="text-xs font-bold text-text-sub dark:text-gray-400 uppercase tracking-wide">
+                                        Webinar</p>
+                                    <h3
+                                        class="text-lg font-bold text-[#101818] dark:text-white leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                                        Mastering the MBA Application Process</h3>
+                                </div>
+                                <div class="flex items-center gap-2 text-text-sub dark:text-gray-400 text-sm mt-1">
+                                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                                    <span>2:00 PM GMT</span>
+                                </div>
+                                <div
+                                    class="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
+                                    <div class="flex items-center gap-2">
+                                        <div class="flex -space-x-2">
+                                            <img alt="Speaker"
+                                                class="w-7 h-7 rounded-full border-2 border-white dark:border-surface-dark"
+                                                data-alt="Portrait of speaker"
+                                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbBjLrGtn-9gfGtw_roa0WjdSjMtWyx1Cj0Qnow653NVDuLUAcctdYv13cQkDm5CtuB0E6PQgQzp20LWuW2i59qyTte8A7DbMgfc90OzmKjAKaIuxW6ThukMFl3b2W2qtOYQP51qZ46khYf6dTMJZNlgxXnv88zbhmFjQEK4yoE3ylOcVDAZTO74LdDLVjklKD76WIcBZFoUvHZApj2fO1ALRElhQGRfpFy6IiXKwM3MnlblATwZ39g-ppK0nGNPVmkvvadiYZ2NqW" />
+                                            <img alt="Speaker"
+                                                class="w-7 h-7 rounded-full border-2 border-white dark:border-surface-dark"
+                                                data-alt="Portrait of speaker"
+                                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtr5cE_AKnGDq9mE_K4PNDw7e47F-0TrDBgxB2xWQ5OsqW79lcUin2KQp500ttRUlCWY0S0aUp1nquc6NzQ5ixqfjujxz56F8ZTGq9D-5ExKlZLOyMyzoxJ9S5gUunT1lQJVdf3GFn8EY647pv4L3OmsO0PydHNhC7871oVksoRjVXNW7wWQcvSurCQXTvPJ4oV_6-DB7LkDdMH5TGi5srommiDWTODePl6MsZpDoxQ_21DDujVcuh8RkF4G6xsTT7COSOiy4OWN-u" />
+                                        </div>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">+2 Speakers</span>
+                                    </div>
+                                    <button
+                                        class="text-primary font-bold text-sm hover:underline decoration-2 underline-offset-4">Register</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Event Card 2 -->
+                        <div
+                            class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-800 hover:-translate-y-1">
+                            <div class="relative h-48 bg-cover bg-center"
+                                data-alt="Students walking through a sunny university campus"
+                                style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuADkDO9p9eu1vatfZaKl5SzdPvPiT1EduXW9QC42f9fjVIpwuZGB6NyiGGrvhOxq82IzLMHsn2D-Y6Sh_Pto9mmke9zF_Oxwa3aYygwlrOvvFoGHWAJsOoZloCb1eYVOO5maeeNFhm_ud_tp9stDdtpUYYRFeubyIPLrSx6aXMwQ81EFcN4eMpOKpTSs32aYDAFa9IuNQOoTHAXKw-oye3ZBpGyhE2ibndBoXu9wiyWfTshrCLeIDP8tFTpN3dy5pTDVTCkOt1Lp4gT");'>
+                                <div class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors">
+                                </div>
+                                <div
+                                    class="absolute top-3 left-3 bg-white dark:bg-[#242a30] rounded-lg px-2.5 py-1.5 flex flex-col items-center shadow-md border border-gray-100 dark:border-gray-700">
+                                    <span class="text-[10px] font-bold text-primary uppercase tracking-wide">NOV</span>
+                                    <span
+                                        class="text-xl font-black text-[#101818] dark:text-white leading-none">05</span>
+                                </div>
+                                <div class="absolute bottom-3 left-3">
+                                    <span
+                                        class="bg-indigo-500/90 text-white text-[10px] font-bold px-2 py-1 rounded backdrop-blur-sm shadow-sm uppercase tracking-wide">In-Person</span>
+                                </div>
+                            </div>
+                            <div class="p-5 flex flex-col gap-3 flex-1">
+                                <div class="flex flex-col gap-1">
+                                    <p
+                                        class="text-xs font-bold text-text-sub dark:text-gray-400 uppercase tracking-wide">
+                                        University Fair</p>
+                                    <h3
+                                        class="text-lg font-bold text-[#101818] dark:text-white leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                                        London International University Fair</h3>
+                                </div>
+                                <div class="flex items-center gap-2 text-text-sub dark:text-gray-400 text-sm mt-1">
+                                    <span class="material-symbols-outlined text-[18px]">location_on</span>
+                                    <span>Excel Centre, London</span>
+                                </div>
+                                <div
+                                    class="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
+                                    <div class="flex items-center gap-2">
+                                        <div class="flex -space-x-2">
+                                            <div
+                                                class="w-7 h-7 rounded-full border-2 border-white dark:border-surface-dark bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600">
+                                                50+</div>
+                                        </div>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Universities</span>
+                                    </div>
+                                    <button
+                                        class="text-primary font-bold text-sm hover:underline decoration-2 underline-offset-4">Get
+                                        Ticket</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Event Card 3 -->
+                        <div
+                            class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-800 hover:-translate-y-1">
+                            <div class="relative h-48 bg-cover bg-center"
+                                data-alt="Student presenting at a science fair"
+                                style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuASrNfzzUL1SLAV3hR0QYIrwcHjxFrpt_ewn0Nh9wzZvNeE2qKYPTJDBI9AkYI4UzdhjPnsn8grfBTXDB06KmTPUoXVqqrQOrKVWFXu1JWUumJTyxy8PSjwaUOl08QejJ-TfeFeBjsjMTpebbFG2BxPX7DReVuh02F3yO5M-uepEb6xhVngc9J8e4tkhvtZs-i4hpycId3suPeODKIWBAdfF2W-kqxaEUGawGh7pYpOl9fNAPJm9DcRThEodqEWJWgF3Pu_ENkwBaF9");'>
+                                <div class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors">
+                                </div>
+                                <div
+                                    class="absolute top-3 left-3 bg-white dark:bg-[#242a30] rounded-lg px-2.5 py-1.5 flex flex-col items-center shadow-md border border-gray-100 dark:border-gray-700">
+                                    <span class="text-[10px] font-bold text-primary uppercase tracking-wide">NOV</span>
+                                    <span
+                                        class="text-xl font-black text-[#101818] dark:text-white leading-none">12</span>
+                                </div>
+                                <div class="absolute bottom-3 left-3">
+                                    <span
+                                        class="bg-emerald-500/90 text-white text-[10px] font-bold px-2 py-1 rounded backdrop-blur-sm shadow-sm uppercase tracking-wide">Online</span>
+                                </div>
+                            </div>
+                            <div class="p-5 flex flex-col gap-3 flex-1">
+                                <div class="flex flex-col gap-1">
+                                    <p
+                                        class="text-xs font-bold text-text-sub dark:text-gray-400 uppercase tracking-wide">
+                                        Workshop</p>
+                                    <h3
+                                        class="text-lg font-bold text-[#101818] dark:text-white leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                                        Women in STEM: Scholarship Guide</h3>
+                                </div>
+                                <div class="flex items-center gap-2 text-text-sub dark:text-gray-400 text-sm mt-1">
+                                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                                    <span>4:00 PM EST</span>
+                                </div>
+                                <div
+                                    class="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
+                                    <div class="flex items-center gap-2">
+                                        <div class="flex -space-x-2">
+                                            <img alt="Speaker"
+                                                class="w-7 h-7 rounded-full border-2 border-white dark:border-surface-dark"
+                                                data-alt="Portrait of speaker"
+                                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiOiC2wQqU8apCg4ZZkLr-Oel8zBTOqHxhRkU5q7yTYAcYCiqyN41Y2hVJqKuCh4XBgr23wxI_OdnuZc2F6kzlanj99uUbk4uWixD4Evf3rIszjwVAqr16VZ6O4geGp-wUicl9ItNDCLiBSUR8ZV1xWJgThBd4xZdNSy-B-QA-xD4aB5HWfw2NewxhwfNWrgs63H77qUGwwV9kVxf1P87qycwlTaPDBJk4uU1_FyCwCZQ2UysDok9-qbZHgLshuTkhkIoPIIwtWPoC" />
+                                        </div>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Prof. Sarah J.</span>
+                                    </div>
+                                    <button
+                                        class="text-primary font-bold text-sm hover:underline decoration-2 underline-offset-4">Register</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Event Card 4 -->
+                        <div
+                            class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-800 hover:-translate-y-1">
+                            <div class="relative h-48 bg-cover bg-center" data-alt="Group of students studying together"
+                                style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBYMFWJD-PKhFB4h3LSFp4W2WT2PBpYMxOFwn141IaaAYz02HpxRYh9QpHu5j8ObfDad7PnExA2BpF3ue5XrIdWLGTdQKfCQXSumPUgcqwjTHJH83jlJuqcOOYYqytn0ahTJp-T4SoElJUmJuFmyOgQF-3sWT9P4MsWQx3d9ONhoxQXBDZNPa77EeJGx0E0S2hQnimsslMVlOQihycjdU7lnYDoGeg8OiBHkXz1jm1tp55aOVQ3_885_KqbTU-vRlHTHV2F-fOTw9yO");'>
+                                <div class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors">
+                                </div>
+                                <div
+                                    class="absolute top-3 left-3 bg-white dark:bg-[#242a30] rounded-lg px-2.5 py-1.5 flex flex-col items-center shadow-md border border-gray-100 dark:border-gray-700">
+                                    <span class="text-[10px] font-bold text-primary uppercase tracking-wide">NOV</span>
+                                    <span
+                                        class="text-xl font-black text-[#101818] dark:text-white leading-none">18</span>
+                                </div>
+                                <div class="absolute bottom-3 left-3">
+                                    <span
+                                        class="bg-purple-500/90 text-white text-[10px] font-bold px-2 py-1 rounded backdrop-blur-sm shadow-sm uppercase tracking-wide">Mixed</span>
+                                </div>
+                            </div>
+                            <div class="p-5 flex flex-col gap-3 flex-1">
+                                <div class="flex flex-col gap-1">
+                                    <p
+                                        class="text-xs font-bold text-text-sub dark:text-gray-400 uppercase tracking-wide">
+                                        Seminar</p>
+                                    <h3
+                                        class="text-lg font-bold text-[#101818] dark:text-white leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                                        Creative Arts Portfolio Review</h3>
+                                </div>
+                                <div class="flex items-center gap-2 text-text-sub dark:text-gray-400 text-sm mt-1">
+                                    <span class="material-symbols-outlined text-[18px]">location_on</span>
+                                    <span>Berlin &amp; Online</span>
+                                </div>
+                                <div
+                                    class="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
+                                    <div class="flex items-center gap-2">
+                                        <div class="flex -space-x-2">
+                                            <img alt="Speaker"
+                                                class="w-7 h-7 rounded-full border-2 border-white dark:border-surface-dark"
+                                                data-alt="Portrait of speaker"
+                                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6XEaVgOzgx93YrGmx0WNFMdUzpAf8J1ZltnhlYKiE3e6mtVia1OoDVblokmSh9aoRDW2in2_hkwMIw8xvRbW_-1IV6OwIYuyDxTixJpH0hNzJOXbrcZv-YPkxStR7b5VrGK7f1_N-_Q321fqZWVnWgWeqYWchKUj9LVTmOKGjsrlUfJy397957r_CLledoaiOPijvbUx_HIqm0M9lkKqHc4ZClwYnhTTh-VW2pnj8Xv4029aOt4eY30zqxGwnKpGEg9k39KR3CaWE" />
+                                        </div>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Design Dept.</span>
+                                    </div>
+                                    <button
+                                        class="text-primary font-bold text-sm hover:underline decoration-2 underline-offset-4">Register</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Event Card 5 -->
+                        <div
+                            class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-800 hover:-translate-y-1">
+                            <div class="relative h-48 bg-cover bg-center" data-alt="Auditorium lecture hall"
+                                style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDO_ozghaM37vU_FHq_NSYXEZyPH6DqdknaAknhl2Jo2fQIvSmCHxnEcZi96CZODs5-o9lQG8teUybgfwxsZZlcgprYP37KGO-LTl_8TUZ0y1oxUQ9vUXSkIRBHDhxb4q1za2628LwZNhg5ouwz_P5wTsSbxt28ODpwit-sviG6DggBQ_6Rb1ChygTFiuhLbpALv8WEOxITEIJtHM2QqCftCsXnSGu895kUJGm1UAsQ_arQ3mL3EfD_CSjiR06riHFXxcPtW4LjjPF6");'>
+                                <div class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors">
+                                </div>
+                                <div
+                                    class="absolute top-3 left-3 bg-white dark:bg-[#242a30] rounded-lg px-2.5 py-1.5 flex flex-col items-center shadow-md border border-gray-100 dark:border-gray-700">
+                                    <span class="text-[10px] font-bold text-primary uppercase tracking-wide">DEC</span>
+                                    <span
+                                        class="text-xl font-black text-[#101818] dark:text-white leading-none">05</span>
+                                </div>
+                                <div class="absolute bottom-3 left-3">
+                                    <span
+                                        class="bg-indigo-500/90 text-white text-[10px] font-bold px-2 py-1 rounded backdrop-blur-sm shadow-sm uppercase tracking-wide">In-Person</span>
+                                </div>
+                            </div>
+                            <div class="p-5 flex flex-col gap-3 flex-1">
+                                <div class="flex flex-col gap-1">
+                                    <p
+                                        class="text-xs font-bold text-text-sub dark:text-gray-400 uppercase tracking-wide">
+                                        Open Day</p>
+                                    <h3
+                                        class="text-lg font-bold text-[#101818] dark:text-white leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                                        MIT Tech Symposium</h3>
+                                </div>
+                                <div class="flex items-center gap-2 text-text-sub dark:text-gray-400 text-sm mt-1">
+                                    <span class="material-symbols-outlined text-[18px]">location_on</span>
+                                    <span>Boston, USA</span>
+                                </div>
+                                <div
+                                    class="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
+                                    <div class="flex items-center gap-2">
+                                        <div class="flex -space-x-2">
+                                            <img alt="Speaker"
+                                                class="w-7 h-7 rounded-full border-2 border-white dark:border-surface-dark"
+                                                data-alt="Portrait of speaker"
+                                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvJT9cL9j53VMZCMSfnOQ6Hfoc3PVfFwtibRJGMhQHVyfzDpLLCRiSiB5jFTkWezm2ZyMfYn2WtrK6I8giZmFGcBJ8kJivIpD3sTLJPIfb-qPKfxRRb3sXYAcRs6pIxMpWf5-Sc7xCNeSjBp7NfjJOaSlih1slMkFBdtvE83ypvYkJK5ntJ7Y4iqhwdRYa-TVy4xPZ3_ERHO2EA6FmYLdETAAAOcoAROHR0DuUlQ1Z4OSCVtJVCMR1iy6QQEPN-0NJpO58sjnITAeE" />
+                                        </div>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Dr. K. Lee</span>
+                                    </div>
+                                    <button
+                                        class="text-primary font-bold text-sm hover:underline decoration-2 underline-offset-4">Get
+                                        Ticket</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Event Card 6 (Empty/Filler for visual balance) -->
+                        <div
+                            class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-800 hover:-translate-y-1">
+                            <div class="relative h-48 bg-cover bg-center"
+                                data-alt="Team brainstorming session with sticky notes"
+                                style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAc0dAawEnG8iyl7Hblw23AjBwfoZNTOqTQW9jGXxq4tAgP26QzXAWzRKjeyf4EdNxziiU1le7y3k01u0Brxe4hhY3uljTC3mTceinY5_26dxDWxB1cdA8Vb7d9RtmCuB6gHgOeX4MphDVQvKxZqhbe-TyvF2Zir8ZLY8P93qzQvqZw6Jpxs0IvtQ3WDMFWlBFk9tCfeKe35DtSPr2JkXl61AmvxE1HH-U8z2IBfr60gPrG8RDdNBn95ZyWlqr5vP9AxBA-rCyjg_c5");'>
+                                <div class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors">
+                                </div>
+                                <div
+                                    class="absolute top-3 left-3 bg-white dark:bg-[#242a30] rounded-lg px-2.5 py-1.5 flex flex-col items-center shadow-md border border-gray-100 dark:border-gray-700">
+                                    <span class="text-[10px] font-bold text-primary uppercase tracking-wide">DEC</span>
+                                    <span
+                                        class="text-xl font-black text-[#101818] dark:text-white leading-none">12</span>
+                                </div>
+                                <div class="absolute bottom-3 left-3">
+                                    <span
+                                        class="bg-emerald-500/90 text-white text-[10px] font-bold px-2 py-1 rounded backdrop-blur-sm shadow-sm uppercase tracking-wide">Online</span>
+                                </div>
+                            </div>
+                            <div class="p-5 flex flex-col gap-3 flex-1">
+                                <div class="flex flex-col gap-1">
+                                    <p
+                                        class="text-xs font-bold text-text-sub dark:text-gray-400 uppercase tracking-wide">
+                                        Q&amp;A Session</p>
+                                    <h3
+                                        class="text-lg font-bold text-[#101818] dark:text-white leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                                        Study Abroad: Financing Your Degree</h3>
+                                </div>
+                                <div class="flex items-center gap-2 text-text-sub dark:text-gray-400 text-sm mt-1">
+                                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                                    <span>10:00 AM PST</span>
+                                </div>
+                                <div
+                                    class="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
+                                    <div class="flex items-center gap-2">
+                                        <div class="flex -space-x-2">
+                                            <img alt="Speaker"
+                                                class="w-7 h-7 rounded-full border-2 border-white dark:border-surface-dark"
+                                                data-alt="Portrait of speaker"
+                                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuARSc9TQcWFNiz7DFTvXwtYR1JiTHdjNQ2BXdZYWW4uYgYzTta2SR01rUb-7IdUZkiwsjPpenC0UM57Id5RejxFm8sF3LmDMU4gub0BWAVNUOemkm7JYIfE_-teL6aO2Y2tbRRSU15E1rRtze1zinEptvXZp33EGMZHJUG5yeWo7dcWK1c3-oU7FyZqj50gbzQzC61-Ig2sXZdsPycQI_F1f56KDYUTTflMOyp5GKtRMnHqtnhIVbCQssHmvfJ5HZUVHhDFzjeY0PuS" />
+                                        </div>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">FinAid Office</span>
+                                    </div>
+                                    <button
+                                        class="text-primary font-bold text-sm hover:underline decoration-2 underline-offset-4">Register</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Pagination -->
+                    <div class="mt-12 flex justify-center">
+                        <nav
+                            class="flex items-center gap-1 bg-surface-light dark:bg-surface-dark p-1 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                            <button
+                                class="w-10 h-10 flex items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 transition-colors">
+                                <span class="material-symbols-outlined">chevron_left</span>
+                            </button>
+                            <button
+                                class="w-10 h-10 flex items-center justify-center rounded-md bg-primary text-white font-bold text-sm shadow-sm">1</button>
+                            <button
+                                class="w-10 h-10 flex items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-text-main dark:text-gray-300 font-medium text-sm transition-colors">2</button>
+                            <button
+                                class="w-10 h-10 flex items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-text-main dark:text-gray-300 font-medium text-sm transition-colors">3</button>
+                            <button
+                                class="w-10 h-10 flex items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 transition-colors">
+                                <span class="material-symbols-outlined">chevron_right</span>
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!-- Footer -->
+        <footer class="bg-white dark:bg-card-dark border-t border-gray-100 dark:border-gray-800 pt-16 pb-8">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
+                    <div class="col-span-2 lg:col-span-2 pr-8">
+                        <div class="flex items-center gap-2 mb-4">
+                            <img src="https://unihunt.org/public/assets/images/favicon_io/favicon.ico" class="w-8 h-8" alt="" srcset="">
+                            <span class="text-xl font-bold tracking-tight">
+                                <span class="text-secondary dark:text-secondary">UNI</span>
+                                <span class="text-primary dark:text-primary">HUNT</span>
+                            </span>
+                        </div>
+                        <p class="text-text-muted text-sm leading-relaxed mb-6 max-w-xs">
+                            Unihunt Course Finder helps students discover the best courses and universities worldwide. With
+                            an easy-to-use interface, it provides detailed course information, admission requirements, and
+                            tuition fees. Find your ideal program quickly and efficiently, making your study abroad journey
+                            smoother and hassle-free.
+                        </p>
+                        <div class="flex gap-4">
+                            <a class="text-gray-400 hover:text-primary transition-colors" href="#"><span
+                                    class="sr-only">Twitter</span>
+                                <svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewbox="0 0 24 24">
+                                    <path
+                                        d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84">
+                                    </path>
+                                </svg>
+                            </a>
+                            <a class="text-gray-400 hover:text-primary transition-colors" href="#"><span
+                                    class="sr-only">LinkedIn</span>
+                                <svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewbox="0 0 24 24">
+                                    <path clip-rule="evenodd"
+                                        d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+                                        fill-rule="evenodd"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-text-main dark:text-white mb-4">Platform</h3>
+                        <ul class="space-y-3 text-sm text-text-muted">
+                            <li><a class="hover:text-primary transition-colors" href="university.html">Browse Universities</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="course.html">Courses</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="scholarship.html">Scholarships</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="events.html">Events</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-text-main dark:text-white mb-4">Resources</h3>
+                        <ul class="space-y-3 text-sm text-text-muted">
+                            <li><a class="hover:text-primary transition-colors" href="blog.html">Blog</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="ai-sop.html">SOP Generator</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="ai-resume.html">Resume Builder</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="#">Student Guides</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-text-main dark:text-white mb-4">Company</h3>
+                        <ul class="space-y-3 text-sm text-text-muted">
+                            <li><a class="hover:text-primary transition-colors" href="about.html">About Us</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="#">Careers</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="partnership.html">Partner with us</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="contact.html">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div
+                    class="border-t border-gray-100 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-text-muted">
+                    <p>Â© 2026 UniHunt Inc. All rights reserved.</p>
+                    <div class="flex gap-6">
+                        <a class="hover:text-text-main transition-colors" href="privacy.html">Privacy Policy</a>
+                        <a class="hover:text-text-main transition-colors" href="#">Terms of Service</a>
+                        <a class="hover:text-text-main transition-colors" href="cookies.html">Cookie Settings</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+
+</html>
+

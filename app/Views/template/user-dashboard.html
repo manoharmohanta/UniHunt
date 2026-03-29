@@ -1,0 +1,573 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>User Application Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
+    <script src="https://unpkg.com/heroicons@2.1.5/outline/index.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#012169",          // Brand navy blue
+                        "primary-hover": "#023a8f",    // Lighter navy for hover
+                        "primary-soft": "#e6ebf4",     // Soft blue background
+
+                        "background-light": "#f8fafc", // Cool light background
+                        "background-dark": "#0c1424",  // Dark navy background
+
+                        "card-light": "#ffffff",
+                        "card-dark": "#121a2f",        // Dark card with blue tone
+
+                        "text-main": "#0b1220",        // Deep readable text
+                        "text-muted": "#5b6b8a",       // Muted blue-gray text
+
+                        "border-light": "#dbe2ef",
+                        "border-dark": "#1e2a44",
+
+                        "success": "#1b9c85",
+                        "warning": "#f0b429",
+                        "danger": "#d64545",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    boxShadow: {
+                        "soft": "0 4px 20px -2px rgba(14, 117, 129, 0.08)",
+                        "card": "0 2px 8px -1px rgba(0, 0, 0, 0.05)",
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <script>
+        // Check local time (Day: 6 AM - 6 PM)
+        const hours = new Date().getHours();
+        const isDayTime = hours >= 6 && hours < 18;
+        
+        // Check storage or default to time-based
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && !isDayTime)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        }
+    </script>
+<style>
+        /* Custom scrollbar for cleaner look */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #475569;
+        }
+
+        .kanban-column {
+            min-width: 300px;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display antialiased overflow-hidden">
+    <div class="flex h-screen w-full">
+        <!-- Sidebar Navigation -->
+        <aside
+            class="w-72 h-full flex flex-col border-r border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark flex-shrink-0 z-20 transition-all">
+            <!-- User Profile Header -->
+            <div class="p-6 pb-2">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="relative group cursor-pointer">
+                        <div class="w-12 h-12 rounded-full bg-cover bg-center border-2 border-primary/20"
+                            data-alt="Profile picture of a female student smiling"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBC54GiZxV3eJTH1MAlD6MR9vbAgfyePVohWiCI4m6_evGspWNszG4MM0pHF7ADXq4JTrubDgrvtraWIMN-lZy-iw8tNdGZBBjFqS8x0ziOOzlGayb39Zxx5E6ynvpRf1825281txyO6AnqtnasapRsLL6LKFerk0UHWNjX4hh66x8CII9VaqxwBYTJA2kPBmhSejgBdw6pvw384UuKaMW7c3yKdhbPYOJgcQWjdTrj3ol60jZX4UoEX6344r8MfkLn4jqd4uuRnfZV');">
+                        </div>
+                        <div
+                            class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-surface-dark">
+                        </div>
+                    </div>
+                    <div class="flex flex-col">
+                        <h2 class="text-base font-bold text-slate-900 dark:text-white leading-tight">Alex Johnson</h2>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs font-medium">Student Account</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Navigation Links -->
+            <nav class="flex-1 flex flex-col gap-1 px-3 overflow-y-auto custom-scrollbar">
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group"
+                    href="user-ai.html">
+                    <span
+                        class="material-symbols-outlined text-[22px] text-slate-400 group-hover:text-primary transition-colors">bookmark</span>
+                    <span class="text-sm font-medium">Saved Universities</span>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group"
+                    href="#">
+                    <span
+                        class="material-symbols-outlined text-[22px] text-slate-400 group-hover:text-primary transition-colors">menu_book</span>
+                    <span class="text-sm font-medium">Saved Courses</span>
+                </a>
+                <!-- Active State -->
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary dark:text-primary-400 font-semibold relative"
+                    href="#">
+                    <span
+                        class="material-symbols-outlined text-[22px] font-variation-settings-'FILL'1">description</span>
+                    <span class="text-sm">My Applications</span>
+                    <span class="absolute right-3 w-1.5 h-1.5 rounded-full bg-primary"></span>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group"
+                    href="#">
+                    <span
+                        class="material-symbols-outlined text-[22px] text-slate-400 group-hover:text-primary transition-colors">settings</span>
+                    <span class="text-sm font-medium">Settings</span>
+                </a>
+            </nav>
+            <!-- Bottom Actions -->
+            <div class="p-4 border-t border-border-light dark:border-border-dark mt-auto">
+                <button
+                    class="flex items-center gap-3 px-3 py-2.5 w-full rounded-lg text-slate-500 dark:text-slate-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors">
+                    <span class="material-symbols-outlined text-[22px]">logout</span>
+                    <span class="text-sm font-medium">Log Out</span>
+                </button>
+            </div>
+        </aside>
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+            <!-- Header Section -->
+            <header class="flex-shrink-0 px-8 py-6 bg-background-light dark:bg-background-dark z-10">
+                <div class="flex flex-col gap-6">
+                    <!-- Top Row: Breadcrumbs & Search -->
+                    <div class="flex justify-between items-center gap-4">
+                        <div class="hidden md:flex text-sm text-slate-500 font-medium">
+                            <span>Dashboard</span>
+                            <span class="mx-2">/</span>
+                            <span class="text-slate-900 dark:text-white">Applications</span>
+                        </div>
+                        <!-- Search Bar -->
+                        <div class="flex-1 max-w-md ml-auto">
+                            <label class="relative flex items-center group">
+                                <span
+                                    class="material-symbols-outlined absolute left-3 text-slate-400 group-focus-within:text-primary">search</span>
+                                <input
+                                    class="w-full bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-700 rounded-lg py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm placeholder:text-slate-400 text-slate-800 dark:text-slate-200"
+                                    placeholder="Search university or course..." type="text" />
+                            </label>
+                        </div>
+                        <!-- Notifications -->
+                        <button
+                            class="w-10 h-10 rounded-full bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 hover:text-primary hover:border-primary/50 transition-colors shadow-sm relative">
+                            <span class="material-symbols-outlined text-[20px]">notifications</span>
+                            <span
+                                class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                        </button>
+                    </div>
+                    <!-- Main Heading & Actions -->
+                    <div class="flex flex-wrap justify-between items-end gap-4">
+                        <div>
+                            <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-1">My
+                                Applications</h1>
+                            <p class="text-slate-500 dark:text-slate-400 text-base">Track your progress and manage your
+                                upcoming deadlines.</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button
+                                class="hidden sm:flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm">
+                                <span class="material-symbols-outlined text-[20px]">filter_list</span>
+                                Filter
+                            </button>
+                            <button
+                                class="flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover rounded-lg text-white text-sm font-bold shadow-lg shadow-primary/25 transition-all active:scale-95">
+                                <span class="material-symbols-outlined text-[20px]">add</span>
+                                New Application
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Stats Row -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-2">
+                        <div
+                            class="bg-white dark:bg-surface-dark p-4 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-4">
+                            <div
+                                class="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                                <span class="material-symbols-outlined">description</span>
+                            </div>
+                            <div>
+                                <p
+                                    class="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
+                                    Total Active</p>
+                                <p class="text-2xl font-bold text-slate-900 dark:text-white">6</p>
+                            </div>
+                        </div>
+                        <div
+                            class="bg-white dark:bg-surface-dark p-4 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-4">
+                            <div
+                                class="w-10 h-10 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 flex items-center justify-center">
+                                <span class="material-symbols-outlined">pending_actions</span>
+                            </div>
+                            <div>
+                                <p
+                                    class="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
+                                    Action Needed</p>
+                                <p class="text-2xl font-bold text-slate-900 dark:text-white">2</p>
+                            </div>
+                        </div>
+                        <div
+                            class="bg-white dark:bg-surface-dark p-4 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-4">
+                            <div
+                                class="w-10 h-10 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                                <span class="material-symbols-outlined">school</span>
+                            </div>
+                            <div>
+                                <p
+                                    class="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
+                                    Offers</p>
+                                <p class="text-2xl font-bold text-slate-900 dark:text-white">1</p>
+                            </div>
+                        </div>
+                        <!-- Chips / Filter Toggles (Mini) -->
+                        <div class="flex flex-col justify-center gap-2 lg:pl-4">
+                            <div class="flex gap-2">
+                                <span
+                                    class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer">All
+                                    Semesters</span>
+                                <span
+                                    class="px-3 py-1 rounded-full text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 cursor-pointer hover:border-primary/50">Fall
+                                    2024</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span
+                                    class="px-3 py-1 rounded-full text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 cursor-pointer hover:border-primary/50">USA</span>
+                                <span
+                                    class="px-3 py-1 rounded-full text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 cursor-pointer hover:border-primary/50">UK</span>
+                                <span
+                                    class="px-3 py-1 rounded-full text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 cursor-pointer hover:border-primary/50">Canada</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <!-- Kanban Board Container -->
+            <div class="flex-1 overflow-x-auto overflow-y-hidden p-8 pt-2 custom-scrollbar">
+                <div class="flex h-full gap-6 min-w-max pb-4">
+                    <!-- COLUMN 1: DRAFTS -->
+                    <div class="kanban-column w-80 flex flex-col h-full">
+                        <div class="flex items-center justify-between mb-4 px-1">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-slate-300"></div>
+                                <h3
+                                    class="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide">
+                                    Drafts</h3>
+                                <span
+                                    class="bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-full text-xs font-bold">1</span>
+                            </div>
+                            <button class="text-slate-400 hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined text-[20px]">add</span>
+                            </button>
+                        </div>
+                        <!-- Draggable Area -->
+                        <div class="flex-1 flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
+                            <!-- Card 1 -->
+                            <div
+                                class="group bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-primary/30 transition-all cursor-pointer relative">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="w-10 h-10 rounded-lg bg-slate-50 p-1.5 border border-slate-100">
+                                        <img class="w-full h-full object-contain mix-blend-multiply opacity-80"
+                                            data-alt="University of Melbourne Logo"
+                                            onerror="this.src='https://placeholder.pics/svg/300'"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjSvSohW5mi0R4-0cJZb1VHDHHfgkM-d6FJ6T1Cow1yF5xwuZdEIEKlXg5G06ZtWZEwQBKUea_4S5SFR2ZTbQdlIdBBHWFaE3Pa156tj88a5tjvLLDN4uWViJL5ga3udUQDVGA37LyYJi52ngBO5HwC3tCABe75ZkI7DUhDF8bUypA-zSee3rXlX88ij7ui_qzxp4xYbLnMm9TwO0uPk83FmXBf03C32xF9ji6SjnQ-WHSyOfrbwWZmjnD_aGQ8trIXFBHlb9r43Nf" />
+                                    </div>
+                                    <button class="text-slate-300 hover:text-slate-500">
+                                        <span class="material-symbols-outlined text-[20px]">more_horiz</span>
+                                    </button>
+                                </div>
+                                <h4
+                                    class="font-bold text-slate-900 dark:text-white text-lg leading-tight mb-1 group-hover:text-primary transition-colors">
+                                    Master of Data Science</h4>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">University of Melbourne</p>
+                                <div class="flex items-center justify-between mt-auto">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-semibold">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                                        Not Started
+                                    </span>
+                                    <div class="text-xs text-slate-400 font-medium flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[14px]">calendar_today</span>
+                                        Oct 15
+                                    </div>
+                                </div>
+                                <div
+                                    class="absolute bottom-0 left-0 h-1 bg-slate-300 w-0 group-hover:w-full transition-all duration-300 rounded-b-xl">
+                                </div>
+                            </div>
+                            <!-- Empty State Illustration Placeholder -->
+                            <div
+                                class="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-4 flex flex-col items-center justify-center text-center h-32 opacity-50 hover:opacity-100 hover:border-primary/40 transition-all cursor-pointer">
+                                <span class="material-symbols-outlined text-slate-300 text-3xl mb-1">note_add</span>
+                                <p class="text-xs font-medium text-slate-400">Add another draft</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- COLUMN 2: DOCUMENTS PENDING -->
+                    <div class="kanban-column w-80 flex flex-col h-full">
+                        <div class="flex items-center justify-between mb-4 px-1">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-yellow-400"></div>
+                                <h3
+                                    class="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide">
+                                    Docs Pending</h3>
+                                <span
+                                    class="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 px-2 py-0.5 rounded-full text-xs font-bold">2</span>
+                            </div>
+                        </div>
+                        <div class="flex-1 flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
+                            <!-- Card 2 -->
+                            <div
+                                class="group bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-primary/30 transition-all cursor-pointer relative">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="w-10 h-10 rounded-lg bg-slate-50 p-1.5 border border-slate-100">
+                                        <img class="w-full h-full object-contain mix-blend-multiply opacity-80"
+                                            data-alt="University of Toronto Logo"
+                                            onerror="this.src='https://placeholder.pics/svg/300'"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjtbHMdV-W5xZCIx-61yllKlj-MYVsvERX7_wMZfn1sgJRnb8USuFJfLeHLmAYyDQCBySsTjbxrDbltKcXf0UhqQU4WdMFLAWe2US3_Y6Gx2w_cfj-MWsL8K9Sk4B3ugUMkdbEPuFbZrDj__ZDnc98xw5LBJBxfGqFldK0NGIHeKImlfgqV2xYZ5zBcccHMnPA-f6FvMUFrp3R_DmzheF6zO4LN2cm7Zw6hZRSmesfIEZOBlRpEcC7QTIhRTWSASzC35s8NYAeigag" />
+                                    </div>
+                                    <button class="text-slate-300 hover:text-slate-500">
+                                        <span class="material-symbols-outlined text-[20px]">more_horiz</span>
+                                    </button>
+                                </div>
+                                <h4
+                                    class="font-bold text-slate-900 dark:text-white text-lg leading-tight mb-1 group-hover:text-primary transition-colors">
+                                    B.Sc. Computer Science</h4>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-3">University of Toronto</p>
+                                <!-- Alert Box -->
+                                <div
+                                    class="bg-yellow-50 dark:bg-yellow-900/10 p-2 rounded-md mb-3 border border-yellow-100 dark:border-yellow-900/20">
+                                    <div
+                                        class="flex items-center gap-2 text-yellow-700 dark:text-yellow-500 text-xs font-bold">
+                                        <span class="material-symbols-outlined text-[16px]">warning</span>
+                                        Missing Transcript
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between mt-auto">
+                                    <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-1.5 mt-1 mr-4">
+                                        <div class="bg-yellow-400 h-1.5 rounded-full" style="width: 60%"></div>
+                                    </div>
+                                    <div class="text-xs text-red-500 font-bold whitespace-nowrap">
+                                        2 days left
+                                    </div>
+                                </div>
+                                <div
+                                    class="absolute bottom-0 left-0 h-1 bg-yellow-400 w-0 group-hover:w-full transition-all duration-300 rounded-b-xl">
+                                </div>
+                            </div>
+                            <!-- Card 3 -->
+                            <div
+                                class="group bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-primary/30 transition-all cursor-pointer relative">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="w-10 h-10 rounded-lg bg-slate-50 p-1.5 border border-slate-100">
+                                        <img class="w-full h-full object-contain mix-blend-multiply opacity-80"
+                                            data-alt="UCLA Logo" onerror="this.src='https://placeholder.pics/svg/300'"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_xNDwm9h_3R2hhpZQrjRrfmyq8zQgsLO2akFD7Zss4EYlZ3Xj6hTuzvbudzKGfYdd8_022F9z8gE940vMfAHl23B5E5HGTWD1D_8VSgg2fYoAB0h815Xv6QfHGdgZr4Z4EVwC84xlfSUoCNFsGpEAyFMmZWx1M3yk1_wFziiYWGPhH7OjBMStiQuX5KBOzsGmOqqfTH5qttw6sR0neZ3am0Yze8d423_U2od6JxilaoMrWj3bl_I7_TLWaIHF2KzIyukRTyDQBfaE" />
+                                    </div>
+                                    <button class="text-slate-300 hover:text-slate-500">
+                                        <span class="material-symbols-outlined text-[20px]">more_horiz</span>
+                                    </button>
+                                </div>
+                                <h4
+                                    class="font-bold text-slate-900 dark:text-white text-lg leading-tight mb-1 group-hover:text-primary transition-colors">
+                                    Film &amp; Television MA</h4>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">UCLA</p>
+                                <div class="flex items-center justify-between mt-auto">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 text-xs font-semibold">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>
+                                        In Progress
+                                    </span>
+                                    <div class="text-xs text-slate-400 font-medium">
+                                        Due Nov 01
+                                    </div>
+                                </div>
+                                <div
+                                    class="absolute bottom-0 left-0 h-1 bg-yellow-400 w-0 group-hover:w-full transition-all duration-300 rounded-b-xl">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- COLUMN 3: SUBMITTED -->
+                    <div class="kanban-column w-80 flex flex-col h-full">
+                        <div class="flex items-center justify-between mb-4 px-1">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-primary"></div>
+                                <h3
+                                    class="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide">
+                                    Submitted</h3>
+                                <span
+                                    class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs font-bold">2</span>
+                            </div>
+                        </div>
+                        <div class="flex-1 flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
+                            <!-- Card 4 -->
+                            <div
+                                class="group bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-primary/30 transition-all cursor-pointer relative">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="w-10 h-10 rounded-lg bg-slate-50 p-1.5 border border-slate-100">
+                                        <img class="w-full h-full object-contain mix-blend-multiply opacity-80"
+                                            data-alt="King's College London Logo"
+                                            onerror="this.src='https://placeholder.pics/svg/300'"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCggEtRyf68MR4Pqhg96G9oRu-xJdZjMV3saxAidw1Cei9VZ6ea1aJ4n94yxBFYor3pIlKw-zSpiC3xWQjDOQ6OUMMcCjairufyVGYiFYP4IOW4Xc4kgzh6kmewhdyH3mfyvZ7HuOTCjpgt_hBFIWbKlZJbjd3eTNukpXARTgrum90iigUHTuepgZY6P-io-dY7fpTfDG40mg4uc-_5WOzZ8n0asiDK8rCyrLVSStW6GccQ3c6PBp40KsX_P7KK-mB8-pFzxSLQgmy3" />
+                                    </div>
+                                    <button class="text-slate-300 hover:text-slate-500">
+                                        <span class="material-symbols-outlined text-[20px]">more_horiz</span>
+                                    </button>
+                                </div>
+                                <h4
+                                    class="font-bold text-slate-900 dark:text-white text-lg leading-tight mb-1 group-hover:text-primary transition-colors">
+                                    History BA</h4>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">King's College London</p>
+                                <div class="flex items-center justify-between mt-auto">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-semibold">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                                        Under Review
+                                    </span>
+                                    <div class="text-xs text-slate-400 font-medium">
+                                        Submitted Oct 1
+                                    </div>
+                                </div>
+                                <div
+                                    class="absolute bottom-0 left-0 h-1 bg-primary w-0 group-hover:w-full transition-all duration-300 rounded-b-xl">
+                                </div>
+                            </div>
+                            <!-- Card 5 -->
+                            <div
+                                class="group bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-primary/30 transition-all cursor-pointer relative">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="w-10 h-10 rounded-lg bg-slate-50 p-1.5 border border-slate-100">
+                                        <img class="w-full h-full object-contain mix-blend-multiply opacity-80"
+                                            data-alt="Technical University of Munich Logo"
+                                            onerror="this.src='https://placeholder.pics/svg/300'"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkwbR_Qil_fMEGL2aLZPp-WlMgJiaZ5c2f5gxV7xLf8VaLYbZmX7yFIvS1ehaBjKvaINNWxZvoTO-yikP7aAWi6NHTnRMhMP1dz0QoN-LRW1E-yEeh5Vty0ytOIPoc5m6vR1VHrEvXGXe1A1lpYvCaA8wthDEM4LJ-JutFjQ4tAlf8UfvmJ3cziiSqNA7ysIQ18nHM3bOi-UFy3CvTT7cqGTiQ9Dd4ozl_HCtTyq4KzeSD5DNPHy4NLyhD8TTVZ2NquSEw3Hbirs2W" />
+                                    </div>
+                                    <button class="text-slate-300 hover:text-slate-500">
+                                        <span class="material-symbols-outlined text-[20px]">more_horiz</span>
+                                    </button>
+                                </div>
+                                <h4
+                                    class="font-bold text-slate-900 dark:text-white text-lg leading-tight mb-1 group-hover:text-primary transition-colors">
+                                    M.Sc. Robotics</h4>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">TU Munich</p>
+                                <div class="flex items-center justify-between mt-auto">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-xs font-semibold">
+                                        <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                                        Sent
+                                    </span>
+                                    <div class="text-xs text-slate-400 font-medium">
+                                        Submitted Sep 28
+                                    </div>
+                                </div>
+                                <div
+                                    class="absolute bottom-0 left-0 h-1 bg-primary w-0 group-hover:w-full transition-all duration-300 rounded-b-xl">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- COLUMN 4: DECISION -->
+                    <div class="kanban-column w-80 flex flex-col h-full">
+                        <div class="flex items-center justify-between mb-4 px-1">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-purple-500"></div>
+                                <h3
+                                    class="text-sm font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide">
+                                    Decisions</h3>
+                                <span
+                                    class="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 px-2 py-0.5 rounded-full text-xs font-bold">1</span>
+                            </div>
+                        </div>
+                        <div class="flex-1 flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
+                            <!-- Card 6 -->
+                            <div
+                                class="group bg-gradient-to-br from-purple-50 to-white dark:from-purple-900/20 dark:to-surface-dark p-4 rounded-xl shadow-sm border border-purple-200 dark:border-purple-800 hover:shadow-lg hover:border-purple-300 transition-all cursor-pointer relative overflow-hidden">
+                                <!-- Confetti decoration -->
+                                <div
+                                    class="absolute -top-6 -right-6 w-20 h-20 bg-purple-100 dark:bg-purple-800/30 rounded-full blur-2xl">
+                                </div>
+                                <div class="flex items-start justify-between mb-3 relative z-10">
+                                    <div class="w-10 h-10 rounded-lg bg-white p-1.5 border border-purple-100 shadow-sm">
+                                        <img class="w-full h-full object-contain mix-blend-multiply opacity-80"
+                                            data-alt="Boston University Logo"
+                                            onerror="this.src='https://placeholder.pics/svg/300'"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtfcHADs9gO_364w5Dst9TGtTrOzi7R2U9XF8mp5mjCepcR2u3IGab7yeiw8tmJy5F13UCv37z2VNyZqGNRKiL9VPCN2JvHzHYFMR72jRBL4DTb19H3jYNbXocyyZKgEAd-dNIus5WT09llsExsuDbLfeBCEbLbFOnWDLV433N9bR4fB5Q-w9GfCkRjYTEt_ZPzEfzHv3EykFlpGCUu5t4IaAjD6anpPfWHQn-ryuzsWDThbNzYXlJN_dw8GLMaZhPUaUXCWSB5U7U" />
+                                    </div>
+                                    <button class="text-purple-300 hover:text-purple-500">
+                                        <span class="material-symbols-outlined text-[20px]">star</span>
+                                    </button>
+                                </div>
+                                <h4
+                                    class="font-bold text-slate-900 dark:text-white text-lg leading-tight mb-1 relative z-10">
+                                    MBA Full-Time</h4>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4 relative z-10">Boston
+                                    University</p>
+                                <div class="flex items-center justify-between mt-auto relative z-10">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 text-xs font-bold border border-purple-200 dark:border-purple-800">
+                                        <span class="material-symbols-outlined text-[14px]">verified</span>
+                                        Accepted!
+                                    </span>
+                                    <div class="text-xs text-purple-400 font-medium">
+                                        Respond by May 1
+                                    </div>
+                                </div>
+                                <div class="absolute bottom-0 left-0 h-1 bg-purple-500 w-full rounded-b-xl"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>
+

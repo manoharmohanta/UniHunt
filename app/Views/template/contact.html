@@ -1,0 +1,447 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Contact &amp; Help Center - UniHunt</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
+    <script src="https://unpkg.com/heroicons@2.1.5/outline/index.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#012169",          // Brand navy blue
+                        "primary-hover": "#023a8f",    // Lighter navy for hover
+                        "primary-soft": "#e6ebf4",     // Soft blue background
+
+                        "background-light": "#f8fafc", // Cool light background
+                        "background-dark": "#0c1424",  // Dark navy background
+
+                        "card-light": "#ffffff",
+                        "card-dark": "#121a2f",        // Dark card with blue tone
+
+                        "text-main": "#0b1220",        // Deep readable text
+                        "text-muted": "#5b6b8a",       // Muted blue-gray text
+
+                        "border-light": "#dbe2ef",
+                        "border-dark": "#1e2a44",
+
+                        "success": "#1b9c85",
+                        "warning": "#f0b429",
+                        "danger": "#d64545",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    boxShadow: {
+                        "soft": "0 4px 20px -2px rgba(14, 117, 129, 0.08)",
+                        "card": "0 2px 8px -1px rgba(0, 0, 0, 0.05)",
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <script>
+        // Check local time (Day: 6 AM - 6 PM)
+        const hours = new Date().getHours();
+        const isDayTime = hours >= 6 && hours < 18;
+
+        // Check storage or default to time-based
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && !isDayTime)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        }
+    </script>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-text-main antialiased min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav
+        class="sticky top-0 z-50 w-full bg-card-light/90 dark:bg-card-dark/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-3">
+                    <img src="https://unihunt.org/public/assets/img/logo.webp" alt="UniHunt Logo" class="h-8 w-auto" />
+                </a>
+                <!-- Desktop Links -->
+                <div class="hidden md:flex items-center gap-8">
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="university.html">Universities</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="course.html">Courses</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="#">AI Tools</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="blog.html">Blog</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="#">Accommodation</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="contact.html">Contact Us</a>
+                </div>
+                <!-- CTA Buttons -->
+                <div class="hidden md:flex items-center gap-3">
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleTheme()"
+                        class="p-2 mr-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-text-main dark:text-white"
+                        aria-label="Toggle Dark Mode">
+                        <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+                        <span class="material-symbols-outlined hidden dark:block">light_mode</span>
+                    </button>
+                    <a href="forget.html"
+                        class="px-4 py-2 text-sm font-bold text-text-main bg-background-light hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 rounded-lg transition-colors">
+                        Sign In
+                    </a>
+                    <button
+                        class="px-4 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-hover rounded-lg shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
+                        Get Started
+                    </button>
+                </div>
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button class="text-text-main dark:text-white p-2">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main class="flex-grow w-full max-w-7xl mx-auto px-4 md:px-10 lg:px-40 py-10">
+        <!-- Hero & Search Section -->
+        <section class="flex flex-col items-center justify-center py-10 md:py-16 gap-6 text-center">
+            <div class="space-y-3 max-w-2xl">
+                <h1
+                    class="text-4xl md:text-5xl font-extrabold text-text-main dark:text-white tracking-tight leading-[1.1]">
+                    How can we <span class="text-primary">help you?</span>
+                </h1>
+                <p class="text-text-muted dark:text-gray-400 text-lg">
+                    Find answers to your questions about applications, scholarships, and more.
+                </p>
+            </div>
+            <!-- Search Bar -->
+            <div class="w-full max-w-xl relative mt-4 group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <span
+                        class="material-symbols-outlined text-text-muted group-focus-within:text-primary transition-colors">search</span>
+                </div>
+                <input
+                    class="block w-full pl-12 pr-4 py-4 rounded-xl border-0 bg-white dark:bg-surface-dark text-text-main dark:text-white shadow-soft ring-1 ring-gray-100 dark:ring-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-primary focus:bg-white dark:focus:bg-surface-dark transition-all text-base"
+                    placeholder="Search for articles, guides, or FAQs..." type="text" />
+                <div class="absolute inset-y-0 right-2 flex items-center">
+                    <button
+                        class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-xs font-semibold px-2 py-1 rounded text-gray-500 dark:text-gray-300 transition-colors">
+                        âŒ˜K
+                    </button>
+                </div>
+            </div>
+        </section>
+        <!-- Bento Grid Categories -->
+        <section class="py-8">
+            <h2 class="sr-only">Help Categories</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Card 1 -->
+                <a class="group flex flex-col p-6 rounded-xl bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300"
+                    href="#">
+                    <div
+                        class="size-12 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-2xl">account_circle</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-text-main dark:text-white mb-1">Account Support</h3>
+                    <p class="text-sm text-text-muted dark:text-gray-400">Login issues, profile settings, and
+                        verification.</p>
+                </a>
+                <!-- Card 2 -->
+                <a class="group flex flex-col p-6 rounded-xl bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300"
+                    href="#">
+                    <div
+                        class="size-12 rounded-lg bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center text-purple-600 dark:text-purple-400 mb-4 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-2xl">assignment</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-text-main dark:text-white mb-1">Application Tracking</h3>
+                    <p class="text-sm text-text-muted dark:text-gray-400">Status updates, submission errors, and
+                        deadlines.</p>
+                </a>
+                <!-- Card 3 -->
+                <a class="group flex flex-col p-6 rounded-xl bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300"
+                    href="#">
+                    <div
+                        class="size-12 rounded-lg bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center text-orange-600 dark:text-orange-400 mb-4 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-2xl">smart_toy</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-text-main dark:text-white mb-1">AI Tools Help</h3>
+                    <p class="text-sm text-text-muted dark:text-gray-400">Resume builder, essay assistant, and AI
+                        coaching.</p>
+                </a>
+                <!-- Card 4 -->
+                <a class="group flex flex-col p-6 rounded-xl bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300"
+                    href="#">
+                    <div
+                        class="size-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-2xl">school</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-text-main dark:text-white mb-1">Scholarships</h3>
+                    <p class="text-sm text-text-muted dark:text-gray-400">Finding funding, application guides, and
+                        eligibility.</p>
+                </a>
+            </div>
+        </section>
+        <!-- Contact Split Section -->
+        <section class="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Contact Form (Left - 2 Cols) -->
+            <div
+                class="lg:col-span-2 bg-white dark:bg-surface-dark rounded-xl p-6 md:p-8 shadow-soft border border-gray-100 dark:border-gray-800">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-text-main dark:text-white">Still need help? Send us a message.
+                    </h2>
+                    <p class="text-text-muted dark:text-gray-400 mt-1">Our team typically responds within 24 hours.</p>
+                </div>
+                <form class="space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="space-y-1.5">
+                            <label class="block text-sm font-medium text-text-main dark:text-gray-200" for="name">Full
+                                Name</label>
+                            <input
+                                class="block w-full rounded-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-text-main dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm py-3 px-4"
+                                id="name" placeholder="Jane Doe" type="text" />
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-sm font-medium text-text-main dark:text-gray-200" for="email">Email
+                                Address</label>
+                            <input
+                                class="block w-full rounded-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-text-main dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm py-3 px-4"
+                                id="email" placeholder="jane@example.com" type="email" />
+                        </div>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-medium text-text-main dark:text-gray-200"
+                            for="subject">Subject</label>
+                        <select
+                            class="block w-full rounded-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-text-main dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm py-3 px-4"
+                            id="subject">
+                            <option>General Inquiry</option>
+                            <option>Technical Support</option>
+                            <option>Billing Question</option>
+                            <option>Partnership</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-medium text-text-main dark:text-gray-200"
+                            for="message">Message</label>
+                        <textarea
+                            class="block w-full rounded-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-text-main dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm py-3 px-4"
+                            id="message" placeholder="Describe your issue in detail..." rows="4"></textarea>
+                    </div>
+                    <div class="pt-2">
+                        <button
+                            class="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all w-full sm:w-auto"
+                            type="button">
+                            Submit Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <!-- Direct Support Sidebar (Right - 1 Col) -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Live Chat Card -->
+                <div class="bg-primary text-white rounded-xl p-6 shadow-md relative overflow-hidden group">
+                    <!-- Abstract Pattern Background -->
+                    <div
+                        class="absolute -right-4 -top-4 bg-white/10 w-24 h-24 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700">
+                    </div>
+                    <div
+                        class="absolute -left-4 -bottom-4 bg-white/10 w-20 h-20 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700">
+                    </div>
+                    <div class="relative z-10 flex flex-col items-start gap-4 h-full justify-between">
+                        <div>
+                            <div class="bg-white/20 w-fit p-2 rounded-lg mb-3">
+                                <span class="material-symbols-outlined text-2xl">chat</span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-1">Direct Support</h3>
+                            <p class="text-white/80 text-sm">Need a quick answer? Chat with our support team in
+                                real-time.</p>
+                        </div>
+                        <button
+                            class="w-full bg-white text-primary font-bold py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
+                            Start Live Chat
+                        </button>
+                    </div>
+                </div>
+                <!-- Info Card -->
+                <div
+                    class="bg-white dark:bg-surface-dark rounded-xl p-6 border border-gray-100 dark:border-gray-800 shadow-soft">
+                    <h4 class="font-bold text-text-main dark:text-white mb-4">Other ways to connect</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-primary mt-0.5">mail</span>
+                            <div>
+                                <p
+                                    class="text-xs font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wide">
+                                    General Support</p>
+                                <a class="text-text-main dark:text-white hover:text-primary dark:hover:text-primary font-medium transition-colors"
+                                    href="mailto:unihunt.overseas@gmail.com">unihunt.overseas@gmail.com</a>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-primary mt-0.5">business_center</span>
+                            <div>
+                                <p
+                                    class="text-xs font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wide">
+                                    Partnerships</p>
+                                <a class="text-text-main dark:text-white hover:text-primary dark:hover:text-primary font-medium transition-colors"
+                                    href="mailto:unihunt.overseas@gmail.com">unihunt.overseas@gmail.com</a>
+                            </div>
+                        </div>
+                        <hr class="border-gray-100 dark:border-gray-800 my-2" />
+                        <div>
+                            <p
+                                class="text-xs font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wide mb-3">
+                                Follow us</p>
+                            <div class="flex gap-3">
+                                <a class="size-10 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-text-muted dark:text-gray-400 hover:bg-primary/10 hover:text-primary transition-colors"
+                                    href="#">
+                                    <svg aria-hidden="true" class="w-5 h-5 fill-current" viewbox="0 0 24 24">
+                                        <path
+                                            d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84">
+                                        </path>
+                                    </svg>
+                                </a>
+                                <a class="size-10 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-text-muted dark:text-gray-400 hover:bg-primary/10 hover:text-primary transition-colors"
+                                    href="#">
+                                    <svg aria-hidden="true" class="w-5 h-5 fill-current" viewbox="0 0 24 24">
+                                        <path clip-rule="evenodd"
+                                            d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.468 2.373c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"
+                                            fill-rule="evenodd"></path>
+                                    </svg>
+                                </a>
+                                <a class="size-10 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-text-muted dark:text-gray-400 hover:bg-primary/10 hover:text-primary transition-colors"
+                                    href="#">
+                                    <svg aria-hidden="true" class="w-5 h-5 fill-current" viewbox="0 0 24 24">
+                                        <path clip-rule="evenodd"
+                                            d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+                                            fill-rule="evenodd"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-card-dark border-t border-gray-100 dark:border-gray-800 pt-16 pb-8">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
+                <div class="col-span-2 lg:col-span-2 pr-8">
+                    <div class="flex items-center gap-2 mb-4">
+                        <img src="https://unihunt.org/public/assets/images/favicon_io/favicon.ico" class="w-8 h-8"
+                            alt="" srcset="">
+                        <span class="text-xl font-bold tracking-tight">
+                            <span class="text-secondary dark:text-secondary">UNI</span>
+                            <span class="text-primary dark:text-primary">HUNT</span>
+                        </span>
+                    </div>
+                    <p class="text-text-muted text-sm leading-relaxed mb-6 max-w-xs">
+                        Unihunt Course Finder helps students discover the best courses and universities worldwide. With
+                        an easy-to-use interface, it provides detailed course information, admission requirements, and
+                        tuition fees. Find your ideal program quickly and efficiently, making your study abroad journey
+                        smoother and hassle-free.
+                    </p>
+                    <div class="flex gap-4">
+                        <a class="text-gray-400 hover:text-primary transition-colors" href="#"><span
+                                class="sr-only">Twitter</span>
+                            <svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewbox="0 0 24 24">
+                                <path
+                                    d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84">
+                                </path>
+                            </svg>
+                        </a>
+                        <a class="text-gray-400 hover:text-primary transition-colors" href="#"><span
+                                class="sr-only">LinkedIn</span>
+                            <svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewbox="0 0 24 24">
+                                <path clip-rule="evenodd"
+                                    d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+                                    fill-rule="evenodd"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="font-bold text-text-main dark:text-white mb-4">Platform</h3>
+                    <ul class="space-y-3 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="#">Browse Universities</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Courses</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Scholarships</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Events</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-text-main dark:text-white mb-4">Resources</h3>
+                    <ul class="space-y-3 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="#">Blog</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">SOP Generator</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Resume Builder</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Student Guides</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-text-main dark:text-white mb-4">Company</h3>
+                    <ul class="space-y-3 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="#">About Us</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Careers</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Partner with us</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div
+                class="border-t border-gray-100 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-text-muted">
+                <p>Â© 2026 UniHunt Inc. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a class="hover:text-text-main transition-colors" href="#">Privacy Policy</a>
+                    <a class="hover:text-text-main transition-colors" href="#">Terms of Service</a>
+                    <a class="hover:text-text-main transition-colors" href="#">Cookie Settings</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

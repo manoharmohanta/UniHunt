@@ -1,0 +1,277 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Cookies Preference Center</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
+    <script src="https://unpkg.com/heroicons@2.1.5/outline/index.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#012169",          // Brand navy blue
+                        "primary-hover": "#023a8f",    // Lighter navy for hover
+                        "primary-soft": "#e6ebf4",     // Soft blue background
+
+                        "background-light": "#f8fafc", // Cool light background
+                        "background-dark": "#0c1424",  // Dark navy background
+
+                        "card-light": "#ffffff",
+                        "card-dark": "#121a2f",        // Dark card with blue tone
+
+                        "text-main": "#0b1220",        // Deep readable text
+                        "text-muted": "#5b6b8a",       // Muted blue-gray text
+
+                        "border-light": "#dbe2ef",
+                        "border-dark": "#1e2a44",
+
+                        "success": "#1b9c85",
+                        "warning": "#f0b429",
+                        "danger": "#d64545",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    boxShadow: {
+                        "soft": "0 4px 20px -2px rgba(14, 117, 129, 0.08)",
+                        "card": "0 2px 8px -1px rgba(0, 0, 0, 0.05)",
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <script>
+        // Check local time (Day: 6 AM - 6 PM)
+        const hours = new Date().getHours();
+        const isDayTime = hours >= 6 && hours < 18;
+        
+        // Check storage or default to time-based
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && !isDayTime)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        }
+    </script>
+<style>
+        /* Custom scrollbar for a cleaner feel inside the modal */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #475569;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden">
+    <!-- Decorative background elements to break the solid color (subtle academic feel) -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl"></div>
+    </div>
+    <!-- Main Modal Container -->
+    <div
+        class="relative w-full max-w-[800px] bg-white dark:bg-[#202428] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-black/20 border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh] z-10 transition-all duration-300">
+        <!-- Header Section -->
+        <div
+            class="px-8 pt-8 pb-6 shrink-0 bg-white dark:bg-[#202428] border-b border-slate-50 dark:border-slate-800/50">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <h1 class="text-[28px] font-bold tracking-tight text-[#131516] dark:text-white mb-2 leading-tight">
+                        Your Privacy Preferences</h1>
+                    <p class="text-[#6e797c] dark:text-slate-400 text-[15px] leading-relaxed max-w-2xl">
+                        We use cookies to personalize your university search experience and analyze our traffic.
+                        We believe in transparency across our academic community.
+                    </p>
+                </div>
+                <!-- Close button for modal context (optional but good UX) -->
+                <button
+                    class="hidden sm:flex p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+        </div>
+        <!-- Scrollable Cookie Categories -->
+        <div class="custom-scrollbar overflow-y-auto px-6 sm:px-8 py-6 flex-1 space-y-4 bg-white dark:bg-[#202428]">
+            <!-- Essential Cookies (Locked) -->
+            <div
+                class="group flex flex-col sm:flex-row gap-5 bg-[#F4F6F7] dark:bg-slate-800/40 p-5 rounded-lg border border-transparent dark:border-slate-700/50 hover:border-slate-200 dark:hover:border-slate-700 transition-all">
+                <div class="shrink-0 pt-1">
+                    <div
+                        class="flex items-center justify-center rounded-lg bg-white dark:bg-slate-700 text-[#131516] dark:text-white shadow-sm size-12 border border-slate-100 dark:border-slate-600">
+                        <span class="material-symbols-outlined text-primary" style="font-size: 24px;">shield_lock</span>
+                    </div>
+                </div>
+                <div class="flex flex-1 flex-col justify-center gap-1">
+                    <div class="flex items-center justify-between w-full flex-wrap gap-2">
+                        <h3 class="text-lg font-bold text-[#131516] dark:text-white">Essential Cookies</h3>
+                        <div
+                            class="shrink-0 flex items-center gap-1.5 text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/10">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">lock</span>
+                            <span class="text-[11px] font-bold uppercase tracking-wider">Always Active</span>
+                        </div>
+                    </div>
+                    <p class="text-[#6e797c] dark:text-slate-400 text-sm leading-relaxed mt-1">
+                        Necessary for the website to function (e.g., logging in, saving safe search filters). These
+                        cannot be switched off.
+                    </p>
+                </div>
+            </div>
+            <!-- Functional Cookies -->
+            <div
+                class="group flex flex-col sm:flex-row gap-5 bg-[#F4F6F7] dark:bg-slate-800/40 p-5 rounded-lg border border-transparent dark:border-slate-700/50 hover:border-primary/30 dark:hover:border-primary/30 transition-all">
+                <div class="shrink-0 pt-1">
+                    <div
+                        class="flex items-center justify-center rounded-lg bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-300 shadow-sm size-12 border border-slate-100 dark:border-slate-600 group-hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined" style="font-size: 24px;">tune</span>
+                    </div>
+                </div>
+                <div class="flex flex-1 flex-col justify-center gap-1">
+                    <div class="flex items-center justify-between w-full flex-wrap gap-2">
+                        <h3 class="text-lg font-bold text-[#131516] dark:text-white">Functional Cookies</h3>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input class="sr-only peer" type="checkbox" />
+                            <div
+                                class="w-[51px] h-[31px] bg-slate-200 dark:bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:transition-all dark:border-gray-600 peer-checked:bg-primary shadow-inner">
+                            </div>
+                        </label>
+                    </div>
+                    <p class="text-[#6e797c] dark:text-slate-400 text-sm leading-relaxed mt-1">
+                        Enable enhanced functionality and personalization, such as remembering your preferred currency
+                        or language.
+                    </p>
+                </div>
+            </div>
+            <!-- Analytical Cookies -->
+            <div
+                class="group flex flex-col sm:flex-row gap-5 bg-[#F4F6F7] dark:bg-slate-800/40 p-5 rounded-lg border border-transparent dark:border-slate-700/50 hover:border-primary/30 dark:hover:border-primary/30 transition-all">
+                <div class="shrink-0 pt-1">
+                    <div
+                        class="flex items-center justify-center rounded-lg bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-300 shadow-sm size-12 border border-slate-100 dark:border-slate-600 group-hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined" style="font-size: 24px;">bar_chart</span>
+                    </div>
+                </div>
+                <div class="flex flex-1 flex-col justify-center gap-1">
+                    <div class="flex items-center justify-between w-full flex-wrap gap-2">
+                        <h3 class="text-lg font-bold text-[#131516] dark:text-white">Analytical Cookies</h3>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input class="sr-only peer" type="checkbox" />
+                            <div
+                                class="w-[51px] h-[31px] bg-slate-200 dark:bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:transition-all dark:border-gray-600 peer-checked:bg-primary shadow-inner">
+                            </div>
+                        </label>
+                    </div>
+                    <p class="text-[#6e797c] dark:text-slate-400 text-sm leading-relaxed mt-1">
+                        Help us understand how you use the platform so we can improve the discovery tools for future
+                        students.
+                    </p>
+                </div>
+            </div>
+            <!-- Marketing Cookies -->
+            <div
+                class="group flex flex-col sm:flex-row gap-5 bg-[#F4F6F7] dark:bg-slate-800/40 p-5 rounded-lg border border-transparent dark:border-slate-700/50 hover:border-primary/30 dark:hover:border-primary/30 transition-all">
+                <div class="shrink-0 pt-1">
+                    <div
+                        class="flex items-center justify-center rounded-lg bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-300 shadow-sm size-12 border border-slate-100 dark:border-slate-600 group-hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined" style="font-size: 24px;">campaign</span>
+                    </div>
+                </div>
+                <div class="flex flex-1 flex-col justify-center gap-1">
+                    <div class="flex items-center justify-between w-full flex-wrap gap-2">
+                        <h3 class="text-lg font-bold text-[#131516] dark:text-white">Marketing Cookies</h3>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input class="sr-only peer" type="checkbox" />
+                            <div
+                                class="w-[51px] h-[31px] bg-slate-200 dark:bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[27px] after:w-[27px] after:transition-all dark:border-gray-600 peer-checked:bg-primary shadow-inner">
+                            </div>
+                        </label>
+                    </div>
+                    <p class="text-[#6e797c] dark:text-slate-400 text-sm leading-relaxed mt-1">
+                        Used to deliver relevant advertisements regarding university programs tailored to your
+                        interests.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- Footer Action Bar -->
+        <div
+            class="p-6 bg-white dark:bg-[#202428] border-t border-slate-100 dark:border-slate-800 shrink-0 shadow-[0_-4px_20px_rgb(0,0,0,0.02)]">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <!-- Tertiary Action -->
+                <button
+                    class="w-full md:w-auto text-[#6e797c] hover:text-[#131516] dark:text-slate-400 dark:hover:text-slate-200 font-medium px-4 py-3 text-sm transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg order-3 md:order-1">
+                    Reject Non-Essential
+                </button>
+                <!-- Primary Actions Group -->
+                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto order-2">
+                    <button
+                        class="flex-1 sm:flex-none border border-primary text-primary hover:bg-primary/5 dark:hover:bg-primary/20 px-6 py-3 rounded-lg text-sm font-bold transition-all focus:ring-2 focus:ring-primary/50 focus:outline-none">
+                        Save Preferences
+                    </button>
+                    <button
+                        class="flex-1 sm:flex-none bg-primary hover:bg-[#34545e] text-white px-8 py-3 rounded-lg text-sm font-bold shadow-lg shadow-primary/20 transition-all hover:shadow-primary/30 transform hover:-translate-y-0.5 focus:ring-2 focus:ring-primary/50 focus:outline-none">
+                        Accept All
+                    </button>
+                </div>
+            </div>
+            <!-- Policy Links -->
+            <div class="mt-4 pt-2 flex justify-center md:justify-end gap-6 border-t border-transparent">
+                <a class="text-xs font-medium text-slate-400 hover:text-primary transition-colors" href="#">Privacy
+                    Policy</a>
+                <a class="text-xs font-medium text-slate-400 hover:text-primary transition-colors" href="#">Cookie
+                    Policy</a>
+                <span class="text-xs text-slate-300">|</span>
+                <a class="text-xs font-medium text-slate-400 hover:text-primary transition-colors" href="#">Imprint</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+

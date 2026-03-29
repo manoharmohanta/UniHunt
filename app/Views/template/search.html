@@ -1,0 +1,874 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>UniHunt - University Directory</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
+    <script src="https://unpkg.com/heroicons@2.1.5/outline/index.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#012169",          // Brand navy blue
+                        "primary-hover": "#023a8f",    // Lighter navy for hover
+                        "primary-soft": "#e6ebf4",     // Soft blue background
+
+                        "secondary": "#c91331",        // Brand red
+                        "secondary-hover": "#e23b55",  // Hover red (brighter)
+                        "secondary-soft": "#fde8ec",   // Soft red background
+
+                        "background-light": "#f8fafc", // Cool light background
+                        "background-dark": "#0c1424",  // Dark navy background
+
+                        "card-light": "#ffffff",
+                        "card-dark": "#121a2f",        // Dark card with blue tone
+
+                        "text-main": "#0b1220",        // Deep readable text
+                        "text-muted": "#5b6b8a",       // Muted blue-gray text
+
+                        "border-light": "#dbe2ef",
+                        "border-dark": "#1e2a44",
+
+                        "success": "#1b9c85",
+                        "warning": "#f0b429",
+                        "danger": "#d64545",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    boxShadow: {
+                        "soft": "0 4px 20px -2px rgba(14, 117, 129, 0.08)",
+                        "card": "0 2px 8px -1px rgba(0, 0, 0, 0.05)",
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <script>
+        // Check local time (Day: 6 AM - 6 PM)
+        const hours = new Date().getHours();
+        const isDayTime = hours >= 6 && hours < 18;
+        
+        // Check storage or default to time-based
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && !isDayTime)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        }
+    </script>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-text-main dark:text-gray-100 min-h-screen flex flex-col">
+    <!-- Top Navigation -->
+    <nav
+        class="sticky top-0 z-50 w-full bg-card-light/90 dark:bg-card-dark/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-3">
+                    <img 
+                        src="https://unihunt.org/public/assets/img/logo.webp" 
+                        alt="UniHunt Logo"
+                        class="h-8 w-auto"
+                    />
+                </a>
+                <!-- Desktop Links -->
+                <div class="hidden md:flex items-center gap-8">
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="university.html">Universities</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="course.html">Courses</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="#">AI Tools</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="blog.html">Blog</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="#">Accommodation</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="contact.html">Contact Us</a>
+                </div>
+                <!-- CTA Buttons -->
+                <div class="hidden md:flex items-center gap-3">
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleTheme()" 
+                        class="p-2 mr-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-text-main dark:text-white" 
+                        aria-label="Toggle Dark Mode">
+                        <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+                        <span class="material-symbols-outlined hidden dark:block">light_mode</span>
+                    </button>
+                    <a href="forget.html"
+                        class="px-4 py-2 text-sm font-bold text-text-main bg-background-light hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 rounded-lg transition-colors">
+                        Sign In
+                    </a>
+                    <button
+                        class="px-4 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-hover rounded-lg shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
+                        Get Started
+                    </button>
+                </div>
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button class="text-text-main dark:text-white p-2">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Main Layout -->
+    <div class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Breadcrumbs -->
+        <nav aria-label="Breadcrumb" class="flex mb-8">
+            <ol class="flex items-center space-x-2">
+                <li><a class="text-text-muted hover:text-primary text-sm font-medium" href="#">Home</a></li>
+                <li><span class="text-text-muted text-sm">/</span></li>
+                <li><a class="text-text-muted hover:text-primary text-sm font-medium" href="#">Study Abroad</a></li>
+                <li><span class="text-text-muted text-sm">/</span></li>
+                <li><span class="text-text-main dark:text-white text-sm font-medium">Universities</span></li>
+            </ol>
+        </nav>
+        <div class="flex flex-col lg:flex-row gap-8 items-start">
+            <!-- Filters Sidebar -->
+            <aside
+                class="w-full lg:w-80 shrink-0 lg:sticky lg:top-24 bg-surface-light dark:bg-surface-dark rounded-xl shadow-soft border border-border-light dark:border-border-dark p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-bold">Filter Results</h3>
+                    <button class="text-xs font-medium text-text-muted hover:text-primary">Clear All</button>
+                </div>
+                <!-- Country Filter -->
+                <div class="mb-8">
+                    <label class="block text-sm font-bold mb-3">Location</label>
+                    <div class="relative mb-3">
+                        <span
+                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-muted">
+                            <span class="material-symbols-outlined text-lg">search</span>
+                        </span>
+                        <input
+                            class="w-full pl-9 pr-3 py-2 text-sm border border-border-light dark:border-border-dark rounded-lg bg-background-light dark:bg-gray-800 focus:ring-1 focus:ring-primary focus:border-primary"
+                            placeholder="Search Country" type="text" />
+                    </div>
+                    <div class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input checked=""
+                                class="size-4 rounded border-gray-300 text-primary focus:ring-primary bg-transparent"
+                                type="checkbox" />
+                            <span
+                                class="text-sm text-text-main dark:text-gray-300 group-hover:text-primary transition-colors">United
+                                States</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input class="size-4 rounded border-gray-300 text-primary focus:ring-primary bg-transparent"
+                                type="checkbox" />
+                            <span
+                                class="text-sm text-text-main dark:text-gray-300 group-hover:text-primary transition-colors">United
+                                Kingdom</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input class="size-4 rounded border-gray-300 text-primary focus:ring-primary bg-transparent"
+                                type="checkbox" />
+                            <span
+                                class="text-sm text-text-main dark:text-gray-300 group-hover:text-primary transition-colors">Canada</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input class="size-4 rounded border-gray-300 text-primary focus:ring-primary bg-transparent"
+                                type="checkbox" />
+                            <span
+                                class="text-sm text-text-main dark:text-gray-300 group-hover:text-primary transition-colors">Australia</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input class="size-4 rounded border-gray-300 text-primary focus:ring-primary bg-transparent"
+                                type="checkbox" />
+                            <span
+                                class="text-sm text-text-main dark:text-gray-300 group-hover:text-primary transition-colors">Germany</span>
+                        </label>
+                    </div>
+                </div>
+                <!-- Ranking Slider -->
+                <div class="mb-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <label class="text-sm font-bold">World Ranking</label>
+                        <span class="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded">Top 50</span>
+                    </div>
+                    <div class="relative h-2 bg-gray-200 dark:bg-gray-700 rounded-full mb-6">
+                        <div class="absolute left-0 w-1/4 h-full bg-primary rounded-full"></div>
+                        <div
+                            class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 size-4 bg-white border-2 border-primary rounded-full shadow cursor-pointer hover:scale-110 transition-transform">
+                        </div>
+                        <div
+                            class="absolute left-1/4 top-1/2 -translate-y-1/2 -translate-x-1/2 size-4 bg-white border-2 border-primary rounded-full shadow cursor-pointer hover:scale-110 transition-transform">
+                        </div>
+                    </div>
+                    <div class="flex justify-between text-xs text-text-muted">
+                        <span>#1</span>
+                        <span>#500+</span>
+                    </div>
+                </div>
+                <!-- Subject Dropdown -->
+                <div class="mb-8">
+                    <label class="block text-sm font-bold mb-3">Subject &amp; Major</label>
+                    <div class="relative">
+                        <select
+                            class="w-full pl-3 pr-10 py-2.5 text-sm bg-background-light dark:bg-gray-800 border border-border-light dark:border-border-dark rounded-lg appearance-none focus:ring-1 focus:ring-primary focus:border-primary">
+                            <option>Computer Science</option>
+                            <option>Business &amp; Management</option>
+                            <option>Engineering</option>
+                            <option>Medicine</option>
+                            <option>Arts &amp; Design</option>
+                        </select>
+                        <div
+                            class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-text-muted">
+                            <span class="material-symbols-outlined text-lg">expand_more</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tuition Fees -->
+                <div class="mb-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <label class="text-sm font-bold">Max Tuition (USD)</label>
+                        <span class="text-xs text-text-muted">$0 - $50k</span>
+                    </div>
+                    <input
+                        class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-primary"
+                        max="100" min="0" type="range" value="60" />
+                </div>
+                <button
+                    class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                    Apply Filters
+                </button>
+            </aside>
+            <!-- Main Content -->
+            <main class="flex-1 w-full">
+                <!-- Results Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <h1 class="text-2xl font-bold text-text-main dark:text-white">Showing 124 Universities</h1>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm text-text-muted whitespace-nowrap">Sort by:</span>
+                        <div class="relative inline-block text-left w-40">
+                            <select
+                                class="w-full pl-3 pr-8 py-2 text-sm font-medium bg-surface-light dark:bg-surface-dark border-none shadow-soft rounded-lg appearance-none focus:ring-0 cursor-pointer">
+                                <option>Ranking (High to Low)</option>
+                                <option>Tuition (Low to High)</option>
+                                <option>Name (A-Z)</option>
+                            </select>
+                            <div
+                                class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-text-muted">
+                                <span class="material-symbols-outlined text-lg">sort</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- University Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <!-- Card 1 -->
+                    <div
+                        class="group bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden shadow-soft hover:shadow-soft-hover transition-all duration-300 flex flex-col h-full relative">
+                        <!-- Image Container -->
+                        <div class="relative h-48 w-full overflow-hidden">
+                            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                                data-alt="University campus building with classical architecture"
+                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAZxX7w4LKMa__BYTIuGUKkg8uQR7D0Wj4dLNUqez9iAhMLv6oF5AAriqyWryPh1nsAHxptwTpRDZ2TsBOr44YpjZbdCHWMHMQ4UTYBbVpiJtM96FhOeZXHrlhwGaTiv55mQRaJFQ3B_6A_hYqSaWgmBaDvYRFWjVDMAT6Ys1W62ynTAehC_IyQWu09fTTaIF36SxsuZ2cntT0ttnD8hN8TPC2WyZs5qIcdEp2sTCisGKAt9KzhJWwX2dLpQNhfV_nCm-EDfda9WgDC');">
+                            </div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            <!-- Save Button -->
+                            <button
+                                class="absolute top-3 right-3 p-2 bg-white/20 backdrop-blur-md hover:bg-white/40 rounded-full text-white transition-colors">
+                                <span class="material-symbols-outlined text-[20px] font-bold">favorite</span>
+                            </button>
+                            <!-- Ranking Badge -->
+                            <div
+                                class="absolute bottom-3 left-3 bg-secondary text-surface-dark text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                                <span class="material-symbols-outlined text-sm">trophy</span>
+                                #2 World Rank
+                            </div>
+                        </div>
+                        <!-- Card Content -->
+                        <div class="p-5 flex-1 flex flex-col">
+                            <div class="flex items-start justify-between mb-2">
+                                <div>
+                                    <h3 class="font-bold text-lg leading-tight mb-1 text-text-main dark:text-white">
+                                        University of Cambridge</h3>
+                                    <div class="flex items-center text-text-muted text-sm gap-1">
+                                        <span class="material-symbols-outlined text-sm">location_on</span>
+                                        Cambridge, UK
+                                    </div>
+                                </div>
+                                <div
+                                    class="size-10 bg-white rounded-lg p-1 shadow-sm border border-gray-100 flex items-center justify-center shrink-0 -mt-10 z-10 relative">
+                                    <img alt="Cambridge Logo" class="w-full h-full object-contain"
+                                        data-alt="University crest logo"
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGfEI6aBMORZ_9eUP510TSJCtyz19M8UvKRWYnMXW6VPED2dfDBe1jU2gqz1I1ZxGaL4t1psTiCsGbSfoqtcPa9N0kadvNGED410FP0SNifAuyKPAx_vDrt1LAh0Yvb_d8unw9nPP3vHXrxkQufcYcJOnR6yYv4sseksUMqqRUFB2OMQWy2NS2R0JnoTPIg75fHqyKOQg2iJJeb088un9hhVg71ziLWQAizC72jGPCw4JL0bsY1a4s3JVfw6SYnQmdMxJWlqWo3O-B" />
+                                </div>
+                            </div>
+                            <hr class="border-border-light dark:border-border-dark my-4 border-dashed" />
+                            <div class="grid grid-cols-2 gap-y-3 gap-x-2 mb-6">
+                                <div class="flex items-center gap-2">
+                                    <div class="p-1.5 rounded bg-primary/10 text-primary">
+                                        <span class="material-symbols-outlined text-sm block">payments</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-[10px] uppercase font-bold text-text-muted tracking-wider">Tuition</span>
+                                        <span
+                                            class="text-xs font-semibold text-text-main dark:text-gray-200">$45k/yr</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="p-1.5 rounded bg-primary/10 text-primary">
+                                        <span class="material-symbols-outlined text-sm block">verified</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-[10px] uppercase font-bold text-text-muted tracking-wider">Acceptance</span>
+                                        <span class="text-xs font-semibold text-text-main dark:text-gray-200">12%</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="p-1.5 rounded bg-primary/10 text-primary">
+                                        <span class="material-symbols-outlined text-sm block">groups</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-[10px] uppercase font-bold text-text-muted tracking-wider">Students</span>
+                                        <span
+                                            class="text-xs font-semibold text-text-main dark:text-gray-200">24k+</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-auto">
+                                <a class="block w-full text-center py-2.5 rounded-lg border border-border-light dark:border-border-dark hover:border-primary hover:text-primary text-sm font-semibold transition-all dark:text-gray-300 dark:hover:text-primary"
+                                    href="#">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 2 -->
+                    <div
+                        class="group bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden shadow-soft hover:shadow-soft-hover transition-all duration-300 flex flex-col h-full relative">
+                        <div class="relative h-48 w-full overflow-hidden">
+                            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                                data-alt="Modern glass university building"
+                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDaFdHjKgoAxOkaBC9masZS__7yu6W44Rn8Ws4Vak_oohJzhFfZ5kSjKYoleB8QOUpphYzNk-ydY8_-S57EEE6pz6YqpYMDBfzHqbQ2by1xSYWiEuUEgBjP20dBtSCUxNoIqON4hrBlo2pYstQ9C83_NSFnF2kfVlLmWjTVbCKB0e2YKg3X4YNvvQgktV0S-KWFu8bti0Q8rvrCG-85kJe-v91UgZuvyXBapDxm9CEgEO1hnSc-fAntD1OMtIXGSRxl-gCwoA5pHBZq');">
+                            </div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            <button
+                                class="absolute top-3 right-3 p-2 bg-white/20 backdrop-blur-md hover:bg-white/40 rounded-full text-white transition-colors">
+                                <span class="material-symbols-outlined text-[20px] font-bold">favorite</span>
+                            </button>
+                            <div
+                                class="absolute bottom-3 left-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                                <span class="material-symbols-outlined text-sm">stars</span>
+                                #4 World Rank
+                            </div>
+                        </div>
+                        <div class="p-5 flex-1 flex flex-col">
+                            <div class="flex items-start justify-between mb-2">
+                                <div>
+                                    <h3 class="font-bold text-lg leading-tight mb-1 text-text-main dark:text-white">
+                                        Harvard University</h3>
+                                    <div class="flex items-center text-text-muted text-sm gap-1">
+                                        <span class="material-symbols-outlined text-sm">location_on</span>
+                                        Cambridge, USA
+                                    </div>
+                                </div>
+                                <div
+                                    class="size-10 bg-white rounded-lg p-1 shadow-sm border border-gray-100 flex items-center justify-center shrink-0 -mt-10 z-10 relative">
+                                    <span class="text-xs font-bold text-red-800">H</span>
+                                </div>
+                            </div>
+                            <hr class="border-border-light dark:border-border-dark my-4 border-dashed" />
+                            <div class="grid grid-cols-2 gap-y-3 gap-x-2 mb-6">
+                                <div class="flex items-center gap-2">
+                                    <div class="p-1.5 rounded bg-primary/10 text-primary">
+                                        <span class="material-symbols-outlined text-sm block">payments</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-[10px] uppercase font-bold text-text-muted tracking-wider">Tuition</span>
+                                        <span
+                                            class="text-xs font-semibold text-text-main dark:text-gray-200">$54k/yr</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="p-1.5 rounded bg-primary/10 text-primary">
+                                        <span class="material-symbols-outlined text-sm block">verified</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-[10px] uppercase font-bold text-text-muted tracking-wider">Acceptance</span>
+                                        <span class="text-xs font-semibold text-text-main dark:text-gray-200">4%</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="p-1.5 rounded bg-primary/10 text-primary">
+                                        <span class="material-symbols-outlined text-sm block">groups</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-[10px] uppercase font-bold text-text-muted tracking-wider">Students</span>
+                                        <span
+                                            class="text-xs font-semibold text-text-main dark:text-gray-200">22k+</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-auto">
+                                <a class="block w-full text-center py-2.5 rounded-lg border border-border-light dark:border-border-dark hover:border-primary hover:text-primary text-sm font-semibold transition-all dark:text-gray-300 dark:hover:text-primary"
+                                    href="#">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 3 -->
+                    <div
+                        class="group bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden shadow-soft hover:shadow-soft-hover transition-all duration-300 flex flex-col h-full relative">
+                        <div class="relative h-48 w-full overflow-hidden">
+                            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                                data-alt="Students walking on a green university campus"
+                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBNY4d_9R_FScRC0tjR-4H66qXb5PNUTENABpKurim1yu0ofwgnIuLZrhkNN_K2Lfh7700k0zf1UvGjj5CIpiDYA3sIyqTn6QM5ahcNUvX0w0Ba21lizFUiiyQDXXh54H-yXDxfNSSmrjrwk53MeCjgTkFLu3fXonBPKR8Zf9jZ1OzokPd44PJLwLeSWyP-Wp2XsacNbEmIWcj9G1v0RYvV2xjwLrs0WWvQdzd9We_0WPh_XDSJRhH-MN6zjpsBodFKpimqut9vOon8');">
+                            </div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            <button
+                                class="absolute top-3 right-3 p-2 bg-secondary text-surface-dark rounded-full transition-colors">
+                                <span
+                                    class="material-symbols-outlined text-[20px] font-bold fill-current">favorite</span>
+                            </button>
+                            <div
+                                class="absolute bottom-3 left-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                                <span class="material-symbols-outlined text-sm">stars</span>
+                                #27 World Rank
+                            </div>
+                        </div>
+                        <div class="p-5 flex-1 flex flex-col">
+                            <div class="flex items-start justify-between mb-2">
+                                <div>
+                                    <h3 class="font-bold text-lg leading-tight mb-1 text-text-main dark:text-white">
+                                        University of Toronto</h3>
+                                    <div class="flex items-center text-text-muted text-sm gap-1">
+                                        <span class="material-symbols-outlined text-sm">location_on</span>
+                                        Toronto, Canada
+                                    </div>
+                                </div>
+                                <div
+                                    class="size-10 bg-white rounded-lg p-1 shadow-sm border border-gray-100 flex items-center justify-center shrink-0 -mt-10 z-10 relative">
+                                    <span class="text-xs font-bold text-blue-800">UofT</span>
+                                </div>
+                            </div>
+                            <hr class="border-border-light dark:border-border-dark my-4 border-dashed" />
+                            <div class="grid grid-cols-2 gap-y-3 gap-x-2 mb-6">
+                                <div class="flex items-center gap-2">
+                                    <div class="p-1.5 rounded bg-primary/10 text-primary">
+                                        <span class="material-symbols-outlined text-sm block">payments</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-[10px] uppercase font-bold text-text-muted tracking-wider">Tuition</span>
+                                        <span
+                                            class="text-xs font-semibold text-text-main dark:text-gray-200">$42k/yr</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="p-1.5 rounded bg-primary/10 text-primary">
+                                        <span class="material-symbols-outlined text-sm block">verified</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-[10px] uppercase font-bold text-text-muted tracking-wider">Acceptance</span>
+                                        <span class="text-xs font-semibold text-text-main dark:text-gray-200">43%</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="p-1.5 rounded bg-primary/10 text-primary">
+                                        <span class="material-symbols-outlined text-sm block">groups</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-[10px] uppercase font-bold text-text-muted tracking-wider">Students</span>
+                                        <span
+                                            class="text-xs font-semibold text-text-main dark:text-gray-200">60k+</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-auto">
+                                <a class="block w-full text-center py-2.5 rounded-lg border border-border-light dark:border-border-dark hover:border-primary hover:text-primary text-sm font-semibold transition-all dark:text-gray-300 dark:hover:text-primary"
+                                    href="#">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 4 -->
+                    <div
+                        class="group bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden shadow-soft hover:shadow-soft-hover transition-all duration-300 flex flex-col h-full relative">
+                        <div class="relative h-48 w-full overflow-hidden">
+                            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                                data-alt="Sunny university courtyard with students"
+                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCaDhdt5lx3LAsXNh6skX8p-khGzSBdgV-RNEm6mBpIF7PQRkUld4vVSZdhBzwMfaBWJqNcRSuOQ4MKfEg1vcPMnJXrwFgMlOyq9txYCUIkzTLBGTuN10Enw6t9V3alxg_14uz6xiu6qwCpeIUwtojNmJ6R7pXHFrM-LK4HTNd9KCVXrgLIZyqOqR0-serc6ZD0lV_0nbx4kmqGvbo8u_Tc0oKC4d-0H74ab8lLlCM0PTOweDIEJVS9AuOduWsALO2P-bbI49xmuKQf');">
+                            </div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            <button
+                                class="absolute top-3 right-3 p-2 bg-white/20 backdrop-blur-md hover:bg-white/40 rounded-full text-white transition-colors">
+                                <span class="material-symbols-outlined text-[20px] font-bold">favorite</span>
+                            </button>
+                            <div
+                                class="absolute bottom-3 left-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                                <span class="material-symbols-outlined text-sm">stars</span>
+                                #14 World Rank
+                            </div>
+                        </div>
+                        <div class="p-5 flex-1 flex flex-col">
+                            <div class="flex items-start justify-between mb-2">
+                                <div>
+                                    <h3 class="font-bold text-lg leading-tight mb-1 text-text-main dark:text-white">
+                                        University of Melbourne</h3>
+                                    <div class="flex items-center text-text-muted text-sm gap-1">
+                                        <span class="material-symbols-outlined text-sm">location_on</span>
+                                        Melbourne, Australia
+                                    </div>
+                                </div>
+                                <div
+                                    class="size-10 bg-white rounded-lg p-1 shadow-sm border border-gray-100 flex items-center justify-center shrink-0 -mt-10 z-10 relative">
+                                    <span class="text-xs font-bold text-blue-900">UniMelb</span>
+                                </div>
+                            </div>
+                            <hr class="border-border-light dark:border-border-dark my-4 border-dashed" />
+                            <div class="grid grid-cols-2 gap-y-3 gap-x-2 mb-6">
+                                <div class="flex items-center gap-2">
+                                    <div class="p-1.5 rounded bg-primary/10 text-primary">
+                                        <span class="material-symbols-outlined text-sm block">payments</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-[10px] uppercase font-bold text-text-muted tracking-wider">Tuition</span>
+                                        <span
+                                            class="text-xs font-semibold text-text-main dark:text-gray-200">$32k/yr</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="p-1.5 rounded bg-primary/10 text-primary">
+                                        <span class="material-symbols-outlined text-sm block">verified</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-[10px] uppercase font-bold text-text-muted tracking-wider">Acceptance</span>
+                                        <span class="text-xs font-semibold text-text-main dark:text-gray-200">70%</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="p-1.5 rounded bg-primary/10 text-primary">
+                                        <span class="material-symbols-outlined text-sm block">groups</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-[10px] uppercase font-bold text-text-muted tracking-wider">Students</span>
+                                        <span
+                                            class="text-xs font-semibold text-text-main dark:text-gray-200">52k+</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-auto">
+                                <a class="block w-full text-center py-2.5 rounded-lg border border-border-light dark:border-border-dark hover:border-primary hover:text-primary text-sm font-semibold transition-all dark:text-gray-300 dark:hover:text-primary"
+                                    href="#">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 5 -->
+                    <div
+                        class="group bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden shadow-soft hover:shadow-soft-hover transition-all duration-300 flex flex-col h-full relative">
+                        <div class="relative h-48 w-full overflow-hidden">
+                            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                                data-alt="Historic red brick university building"
+                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBA8jBPTVIS14C2ijDIijeMFZvECYC26Wp7v7rG5flQX4gtQAjrPJzWgWwuhuJwiJYGRtMLezllZ4ZXq2saP5Rb5VSk7OZ2nPL85icqrnBG_F_l37fi0KsYWf6GHHzjRIkdg9JdtkPZYUiGiLeMtmM5AAHp1D2PfmpUFUOzy217N5mr5ZNiUTjMe8kfC2aR84muxftWF7bf73WxtbCGGnS47hjCUN-RrrrJxZzhifXQIUYPjccUrwqBT1B4iE0I7Ttye1BgnKNeW568');">
+                            </div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            <button
+                                class="absolute top-3 right-3 p-2 bg-white/20 backdrop-blur-md hover:bg-white/40 rounded-full text-white transition-colors">
+                                <span class="material-symbols-outlined text-[20px] font-bold">favorite</span>
+                            </button>
+                            <div
+                                class="absolute bottom-3 left-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                                <span class="material-symbols-outlined text-sm">stars</span>
+                                #62 World Rank
+                            </div>
+                        </div>
+                        <div class="p-5 flex-1 flex flex-col">
+                            <div class="flex items-start justify-between mb-2">
+                                <div>
+                                    <h3 class="font-bold text-lg leading-tight mb-1 text-text-main dark:text-white">
+                                        Heidelberg University</h3>
+                                    <div class="flex items-center text-text-muted text-sm gap-1">
+                                        <span class="material-symbols-outlined text-sm">location_on</span>
+                                        Heidelberg, Germany
+                                    </div>
+                                </div>
+                                <div
+                                    class="size-10 bg-white rounded-lg p-1 shadow-sm border border-gray-100 flex items-center justify-center shrink-0 -mt-10 z-10 relative">
+                                    <span class="text-xs font-bold text-red-900">UH</span>
+                                </div>
+                            </div>
+                            <hr class="border-border-light dark:border-border-dark my-4 border-dashed" />
+                            <div class="grid grid-cols-2 gap-y-3 gap-x-2 mb-6">
+                                <div class="flex items-center gap-2">
+                                    <div class="p-1.5 rounded bg-primary/10 text-primary">
+                                        <span class="material-symbols-outlined text-sm block">payments</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-[10px] uppercase font-bold text-text-muted tracking-wider">Tuition</span>
+                                        <span
+                                            class="text-xs font-semibold text-text-main dark:text-gray-200">$3k/yr</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="p-1.5 rounded bg-primary/10 text-primary">
+                                        <span class="material-symbols-outlined text-sm block">verified</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-[10px] uppercase font-bold text-text-muted tracking-wider">Acceptance</span>
+                                        <span class="text-xs font-semibold text-text-main dark:text-gray-200">18%</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="p-1.5 rounded bg-primary/10 text-primary">
+                                        <span class="material-symbols-outlined text-sm block">groups</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-[10px] uppercase font-bold text-text-muted tracking-wider">Students</span>
+                                        <span
+                                            class="text-xs font-semibold text-text-main dark:text-gray-200">30k+</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-auto">
+                                <a class="block w-full text-center py-2.5 rounded-lg border border-border-light dark:border-border-dark hover:border-primary hover:text-primary text-sm font-semibold transition-all dark:text-gray-300 dark:hover:text-primary"
+                                    href="#">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 6 -->
+                    <div
+                        class="group bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden shadow-soft hover:shadow-soft-hover transition-all duration-300 flex flex-col h-full relative">
+                        <div class="relative h-48 w-full overflow-hidden">
+                            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                                data-alt="Modern architectural university facade"
+                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBUMWIFlaIqaIUzGnLUtBb_mlAz9KuJpdTcVAsbGUN7CyVuAVqeQEMmW89wIXa0HZa5vexEowG-UxRFY16Nhc5TfuNUpquQis1oxES10gYsk0vuuSBTX3izz0yDOm1BFEpU3sdz5aCUVeue9-YQ5JMdOCEr-xLITn8pTSZ8vqwFFpLXNOWjoNQPViT0wV3z8OJBlQLRAF4Mp4_E25AGBjj6GwStCW2fxAFOiD2Z7U16WRVD_alQC9jarNRFawWcqxArry3xKFMmlDHN');">
+                            </div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            <button
+                                class="absolute top-3 right-3 p-2 bg-white/20 backdrop-blur-md hover:bg-white/40 rounded-full text-white transition-colors">
+                                <span class="material-symbols-outlined text-[20px] font-bold">favorite</span>
+                            </button>
+                            <div
+                                class="absolute bottom-3 left-3 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                                <span class="material-symbols-outlined text-sm">stars</span>
+                                #89 World Rank
+                            </div>
+                        </div>
+                        <div class="p-5 flex-1 flex flex-col">
+                            <div class="flex items-start justify-between mb-2">
+                                <div>
+                                    <h3 class="font-bold text-lg leading-tight mb-1 text-text-main dark:text-white">
+                                        National University of Singapore</h3>
+                                    <div class="flex items-center text-text-muted text-sm gap-1">
+                                        <span class="material-symbols-outlined text-sm">location_on</span>
+                                        Singapore
+                                    </div>
+                                </div>
+                                <div
+                                    class="size-10 bg-white rounded-lg p-1 shadow-sm border border-gray-100 flex items-center justify-center shrink-0 -mt-10 z-10 relative">
+                                    <span class="text-xs font-bold text-orange-600">NUS</span>
+                                </div>
+                            </div>
+                            <hr class="border-border-light dark:border-border-dark my-4 border-dashed" />
+                            <div class="grid grid-cols-2 gap-y-3 gap-x-2 mb-6">
+                                <div class="flex items-center gap-2">
+                                    <div class="p-1.5 rounded bg-primary/10 text-primary">
+                                        <span class="material-symbols-outlined text-sm block">payments</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-[10px] uppercase font-bold text-text-muted tracking-wider">Tuition</span>
+                                        <span
+                                            class="text-xs font-semibold text-text-main dark:text-gray-200">$28k/yr</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="p-1.5 rounded bg-primary/10 text-primary">
+                                        <span class="material-symbols-outlined text-sm block">verified</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-[10px] uppercase font-bold text-text-muted tracking-wider">Acceptance</span>
+                                        <span class="text-xs font-semibold text-text-main dark:text-gray-200">5%</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="p-1.5 rounded bg-primary/10 text-primary">
+                                        <span class="material-symbols-outlined text-sm block">groups</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-[10px] uppercase font-bold text-text-muted tracking-wider">Students</span>
+                                        <span
+                                            class="text-xs font-semibold text-text-main dark:text-gray-200">38k+</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-auto">
+                                <a class="block w-full text-center py-2.5 rounded-lg border border-border-light dark:border-border-dark hover:border-primary hover:text-primary text-sm font-semibold transition-all dark:text-gray-300 dark:hover:text-primary"
+                                    href="#">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Pagination -->
+                <div class="flex justify-center mt-12 gap-2">
+                    <button
+                        class="size-10 flex items-center justify-center rounded-lg border border-border-light dark:border-border-dark text-text-muted hover:bg-surface-light dark:hover:bg-gray-800 transition-colors">
+                        <span class="material-symbols-outlined text-sm">chevron_left</span>
+                    </button>
+                    <button
+                        class="size-10 flex items-center justify-center rounded-lg bg-primary text-white font-bold transition-colors shadow-md">
+                        1
+                    </button>
+                    <button
+                        class="size-10 flex items-center justify-center rounded-lg border border-border-light dark:border-border-dark text-text-muted hover:bg-surface-light dark:hover:bg-gray-800 transition-colors font-medium">
+                        2
+                    </button>
+                    <button
+                        class="size-10 flex items-center justify-center rounded-lg border border-border-light dark:border-border-dark text-text-muted hover:bg-surface-light dark:hover:bg-gray-800 transition-colors font-medium">
+                        3
+                    </button>
+                    <span class="size-10 flex items-center justify-center text-text-muted">...</span>
+                    <button
+                        class="size-10 flex items-center justify-center rounded-lg border border-border-light dark:border-border-dark text-text-muted hover:bg-surface-light dark:hover:bg-gray-800 transition-colors font-medium">
+                        12
+                    </button>
+                    <button
+                        class="size-10 flex items-center justify-center rounded-lg border border-border-light dark:border-border-dark text-text-muted hover:bg-surface-light dark:hover:bg-gray-800 transition-colors">
+                        <span class="material-symbols-outlined text-sm">chevron_right</span>
+                    </button>
+                </div>
+            </main>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-card-dark border-t border-gray-100 dark:border-gray-800 pt-16 pb-8">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
+                <div class="col-span-2 lg:col-span-2 pr-8">
+                    <div class="flex items-center gap-2 mb-4">
+                        <img src="https://unihunt.org/public/assets/images/favicon_io/favicon.ico" class="w-8 h-8" alt="" srcset="">
+                        <span class="text-xl font-bold tracking-tight">
+                            <span class="text-secondary dark:text-secondary">UNI</span>
+                            <span class="text-primary dark:text-primary">HUNT</span>
+                        </span>
+                    </div>
+                    <p class="text-text-muted text-sm leading-relaxed mb-6 max-w-xs">
+                        Unihunt Course Finder helps students discover the best courses and universities worldwide. With
+                        an easy-to-use interface, it provides detailed course information, admission requirements, and
+                        tuition fees. Find your ideal program quickly and efficiently, making your study abroad journey
+                        smoother and hassle-free.
+                    </p>
+                    <div class="flex gap-4">
+                        <a class="text-gray-400 hover:text-primary transition-colors" href="#"><span
+                                class="sr-only">Twitter</span>
+                            <svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewbox="0 0 24 24">
+                                <path
+                                    d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84">
+                                </path>
+                            </svg>
+                        </a>
+                        <a class="text-gray-400 hover:text-primary transition-colors" href="#"><span
+                                class="sr-only">LinkedIn</span>
+                            <svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewbox="0 0 24 24">
+                                <path clip-rule="evenodd"
+                                    d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+                                    fill-rule="evenodd"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="font-bold text-text-main dark:text-white mb-4">Platform</h3>
+                    <ul class="space-y-3 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="#">Browse Universities</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Courses</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Scholarships</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Events</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-text-main dark:text-white mb-4">Resources</h3>
+                    <ul class="space-y-3 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="#">Blog</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">SOP Generator</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Resume Builder</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Student Guides</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-text-main dark:text-white mb-4">Company</h3>
+                    <ul class="space-y-3 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="#">About Us</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Careers</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Partner with us</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div
+                class="border-t border-gray-100 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-text-muted">
+                <p>Â© 2026 UniHunt Inc. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a class="hover:text-text-main transition-colors" href="#">Privacy Policy</a>
+                    <a class="hover:text-text-main transition-colors" href="#">Terms of Service</a>
+                    <a class="hover:text-text-main transition-colors" href="#">Cookie Settings</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

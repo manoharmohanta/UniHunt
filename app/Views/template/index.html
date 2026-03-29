@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>UniHunt - Global Education Platform</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
+    <script src="https://unpkg.com/heroicons@2.1.5/outline/index.js"></script>
+    <!-- Tailwind Configuration -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#012169",          // Brand navy blue
+                        "primary-hover": "#023a8f",    // Lighter navy for hover
+                        "primary-soft": "#e6ebf4",     // Soft blue background
+
+                        "secondary": "#c91331",        // Brand red
+                        "secondary-hover": "#e23b55",  // Hover red (brighter)
+                        "secondary-soft": "#fde8ec",   // Soft red background
+
+                        "background-light": "#f8fafc", // Cool light background
+                        "background-dark": "#0c1424",  // Dark navy background
+
+                        "card-light": "#ffffff",
+                        "card-dark": "#121a2f",        // Dark card with blue tone
+
+                        "text-main": "#0b1220",        // Deep readable text
+                        "text-muted": "#5b6b8a",       // Muted blue-gray text
+
+                        "border-light": "#dbe2ef",
+                        "border-dark": "#1e2a44",
+
+                        "success": "#1b9c85",
+                        "warning": "#f0b429",
+                        "danger": "#d64545",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    boxShadow: {
+                        "soft": "0 4px 20px -2px rgba(14, 117, 129, 0.08)",
+                        "card": "0 2px 8px -1px rgba(0, 0, 0, 0.05)",
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <script>
+        // Check local time (Day: 6 AM - 6 PM)
+        const hours = new Date().getHours();
+        const isDayTime = hours >= 6 && hours < 18;
+
+        // Check storage or default to time-based
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && !isDayTime)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        }
+    </script>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-text-main dark:text-white antialiased transition-colors duration-200">
+    <!-- Top Navigation -->
+    <nav
+        class="sticky top-0 z-50 w-full bg-card-light/90 dark:bg-card-dark/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-3">
+                    <div class="flex items-center">
+                        <img src="https://unihunt.org/public/assets/images/favicon_io/favicon.ico" class="w-8 h-8"
+                            alt="" srcset="">
+                        <span class="text-4xl font-bold tracking-tight">
+                            <span class="text-secondary dark:text-secondary">UNI</span>
+                            <span class="text-primary dark:text-white">HUNT</span>
+                        </span>
+                    </div>
+                </a>
+                <!-- Desktop Links -->
+                <div class="hidden md:flex items-center gap-8">
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="university.html">Universities</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="course.html">Courses</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="index.html#ai-tools">AI Tools</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="blog.html">Blog</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="#">Accommodation</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="contact.html">Contact Us</a>
+                </div>
+                <!-- CTA Buttons -->
+                <div class="hidden md:flex items-center gap-3">
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleTheme()"
+                        class="p-2 mr-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-text-main dark:text-white"
+                        aria-label="Toggle Dark Mode">
+                        <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+                        <span class="material-symbols-outlined hidden dark:block">light_mode</span>
+                    </button>
+                    <a href="login.html"
+                        class="px-4 py-2 text-sm font-bold text-text-main bg-background-light hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 rounded-lg transition-colors">
+                        Sign In
+                    </a>
+                    <a href="register.html"
+                        class="px-4 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-hover rounded-lg shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
+                        Sign Up
+                    </a>
+                </div>
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button class="text-text-main dark:text-white p-2">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Main Content -->
+    <main class="flex flex-col w-full overflow-hidden">
+        <!-- Hero Section -->
+        <section class="relative w-full pt-8 pb-16 px-4 sm:px-6 lg:px-8 flex justify-center">
+            <div
+                class="w-full max-w-[1920px] rounded-3xl overflow-hidden relative min-h-[560px] flex items-center justify-center">
+                <!-- Background Image with Overlay -->
+                <div class="absolute inset-0 z-0">
+                    <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70 z-10"></div>
+                    <img alt="Students walking on a university campus with historic architecture"
+                        class="w-full h-full object-cover"
+                        data-alt="Students walking on a university campus with historic architecture"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-904flvnQCnG0RVJspNJGbtHXNZO365KRpjB7Su-PQHJ38RdCYVd7Z09EgRiXDg0Q5NfZS9UnyjRgbCIOYyJByeDelmgDOpFe-Hrg9sTwSFWnSH647YP2uSkEuW2pPBz4gCdzZ7uJjUskvfoasUOowQJzOQ7dcWz5wfCfNBV0spQA37XsppxPRzh0VE_La6b2uDk5gbbM7MveU04fkbGp_1Gfe6mWvKaLTDzHlhkq88rnVXwDI2NyYiTRi9ZrPGwWzv6vO7uf-APo" />
+                </div>
+                <!-- Content -->
+                <div class="relative z-20 w-full max-w-3xl flex flex-col items-center text-center px-4 space-y-8">
+                    <div class="space-y-4">
+                        <span
+                            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/10 text-xs font-medium text-white tracking-wide uppercase">
+                            <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                            Admissions Open for 2026
+                        </span>
+                        <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.1] tracking-tight">
+                            Your Gateway to <br />Global Education
+                        </h1>
+                        <p class="text-lg md:text-xl text-gray-200 max-w-xl mx-auto font-medium">
+                            Discover universities, generate application docs, and prepare for your future with
+                            AI-powered guidance.
+                        </p>
+                    </div>
+                    <!-- Search Bar Component -->
+                    <div class="w-full bg-white p-2 rounded-2xl shadow-xl flex flex-col sm:flex-row gap-2 items-center">
+                        <div class="flex-1 flex items-center px-4 h-12 w-full">
+                            <span class="material-symbols-outlined text-gray-400 mr-3">search</span>
+                            <input
+                                class="w-full h-full border-none focus:ring-0 text-text-main placeholder-gray-400 text-base font-medium bg-transparent"
+                                placeholder="Search by university, course, or country..." type="text" />
+                        </div>
+                        <div class="hidden sm:block w-px h-8 bg-gray-200"></div>
+                        <button
+                            class="w-full sm:w-auto h-12 px-8 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl transition-all hover:shadow-lg flex items-center justify-center gap-2 group">
+                            Search
+                            <span
+                                class="material-symbols-outlined text-lg transition-transform group-hover:translate-x-1">arrow_forward</span>
+                        </button>
+                    </div>
+                    <!-- Quick Tags -->
+                    <div class="flex flex-wrap justify-center gap-3 text-sm text-white/80">
+                        <span>Trending:</span>
+                        <a class="hover:text-white underline decoration-white/30 hover:decoration-white"
+                            href="#">Computer Science</a>
+                        <span class="w-1 h-1 rounded-full bg-white/40 self-center"></span>
+                        <a class="hover:text-white underline decoration-white/30 hover:decoration-white" href="#">MBA in
+                            UK</a>
+                        <span class="w-1 h-1 rounded-full bg-white/40 self-center"></span>
+                        <a class="hover:text-white underline decoration-white/30 hover:decoration-white" href="#">Data
+                            Science</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Statistics Section -->
+        <section class="bg-background-light dark:background-dark py-20">
+            <div class="max-w-7xl mx-auto px-6">
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+
+                    <!-- Card 1 -->
+                    <div class="bg-white dark:bg-[#121a2f] border border-[#dbe2ef] dark:border-[#1e2a44]
+                            rounded-2xl p-8 text-center transition hover:-translate-y-2 hover:border-[#012169]">
+                        <h2 class="text-4xl font-extrabold text-primary dark:text-white">12K+</h2>
+                        <p class="mt-2 text-sm text-[#5b6b8a] dark:text-white">Students Guided</p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="bg-white dark:bg-[#121a2f] border border-[#dbe2ef] dark:border-[#1e2a44]
+                            rounded-2xl p-8 text-center transition hover:-translate-y-2 hover:border-[#012169]">
+                        <h2 class="text-4xl font-extrabold text-primary dark:text-white">350+</h2>
+                        <p class="mt-2 text-sm text-[#5b6b8a] dark:text-white">Partner Universities</p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="bg-white dark:bg-[#121a2f] border border-[#dbe2ef] dark:border-[#1e2a44]
+                            rounded-2xl p-8 text-center transition hover:-translate-y-2 hover:border-[#012169]">
+                        <h2 class="text-4xl font-extrabold text-primary dark:text-white">98%</h2>
+                        <p class="mt-2 text-sm text-[#5b6b8a] dark:text-white">Visa Success Rate</p>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="bg-white dark:bg-[#121a2f] border border-[#dbe2ef] dark:border-[#1e2a44]
+                            rounded-2xl p-8 text-center transition hover:-translate-y-2 hover:border-[#012169]">
+                        <h2 class="text-4xl font-extrabold text-primary dark:text-white">15+</h2>
+                        <p class="mt-2 text-sm text-[#5b6b8a] dark:text-white">Countries Covered</p>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+        <!-- AI Tools Section -->
+        <section id="ai-tools"
+            class="py-16 px-4 sm:px-6 lg:px-8 bg-white dark:bg-card-dark border-y border-gray-100 dark:border-gray-800">
+            <div class="max-w-[960px] mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-text-main dark:text-white tracking-tight">AI-Powered Application
+                        Tools</h2>
+                    <p class="mt-3 text-text-muted dark:text-gray-400 text-lg">Streamline your application process with
+                        our intelligent assistants.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- SOP Generator -->
+                    <div
+                        class="group relative p-6 bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-300 hover:shadow-soft hover:border-primary/50 hover:-translate-y-1">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-4 transition-colors group-hover:bg-primary group-hover:text-white">
+                            <span class="material-symbols-outlined text-2xl">note_add</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-text-main dark:text-white mb-2">SOP Generator</h3>
+                        <p class="text-sm text-text-muted dark:text-gray-400 leading-relaxed">Create compelling
+                            Statements of Purpose tailored to your profile with AI assistance.</p>
+                        <div
+                            class="mt-4 flex items-center text-primary text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-[-10px] group-hover:translate-x-0">
+                            <a href="ai-sop.html">Try Now <span
+                                    class="material-symbols-outlined text-base ml-1">arrow_forward</span></a>
+                        </div>
+                    </div>
+                    <!-- Resume Builder -->
+                    <div
+                        class="group relative p-6 bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-300 hover:shadow-soft hover:border-primary/50 hover:-translate-y-1">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-4 transition-colors group-hover:bg-primary group-hover:text-white">
+                            <span class="material-symbols-outlined text-2xl">badge</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-text-main dark:text-white mb-2">Resume Builder</h3>
+                        <p class="text-sm text-text-muted dark:text-gray-400 leading-relaxed">Build a professional,
+                            ATS-friendly resume formatted specifically for admission boards.</p>
+                        <div
+                            class="mt-4 flex items-center text-primary text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-[-10px] group-hover:translate-x-0">
+                            <a href="ai-resume.html">Build Now <span
+                                    class="material-symbols-outlined text-base ml-1">arrow_forward</span></a>
+                        </div>
+                    </div>
+                    <!-- Visa Mock Interview -->
+                    <div
+                        class="group relative p-6 bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-300 hover:shadow-soft hover:border-primary/50 hover:-translate-y-1">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 flex items-center justify-center mb-4 transition-colors group-hover:bg-primary group-hover:text-white">
+                            <span class="material-symbols-outlined text-2xl">video_camera_front</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-text-main dark:text-white mb-2">Visa Mock Interview</h3>
+                        <p class="text-sm text-text-muted dark:text-gray-400 leading-relaxed">Practice confidently for
+                            your visa interview with our interactive AI interviewer.</p>
+                        <div
+                            class="mt-4 flex items-center text-primary text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-[-10px] group-hover:translate-x-0">
+                            <a href="ai-mock-interview.html">Start Practice <span
+                                    class="material-symbols-outlined text-base ml-1">arrow_forward</span></a>
+                        </div>
+                    </div>
+                    <!-- AI University Finder -->
+                    <div
+                        class="group relative p-6 bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-300 hover:shadow-soft hover:border-primary/50 hover:-translate-y-1">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white">
+                            <span class="material-symbols-outlined text-2xl">school</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-text-main dark:text-white mb-2">
+                            AI University Finder
+                        </h3>
+                        <p class="text-sm text-text-muted dark:text-gray-400 leading-relaxed">
+                            Discover the best universities and courses based on your academic profile, budget, and
+                            goals.
+                        </p>
+                        <div
+                            class="mt-4 flex items-center text-primary text-sm font-bold opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
+                            <a href="search.html">Find Universities <span
+                                    class="material-symbols-outlined text-base ml-1">arrow_forward</span></a>
+                        </div>
+                    </div>
+
+                    <!-- Admission Predictor -->
+                    <div
+                        class="group relative p-6 bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-300 hover:shadow-soft hover:border-primary/50 hover:-translate-y-1">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white">
+                            <span class="material-symbols-outlined text-2xl">analytics</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-text-main dark:text-white mb-2">
+                            Admission Predictor
+                        </h3>
+                        <p class="text-sm text-text-muted dark:text-gray-400 leading-relaxed">
+                            Predict your admission chances and identify Safe, Moderate, and Dream universities.
+                        </p>
+                        <div
+                            class="mt-4 flex items-center text-primary text-sm font-bold opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
+                            Check Chances <span class="material-symbols-outlined text-base ml-1">arrow_forward</span>
+                        </div>
+                    </div>
+
+                    <!-- Scholarship Finder -->
+                    <div
+                        class="group relative p-6 bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-300 hover:shadow-soft hover:border-primary/50 hover:-translate-y-1">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white">
+                            <span class="material-symbols-outlined text-2xl">workspace_premium</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-text-main dark:text-white mb-2">
+                            Scholarship Finder AI
+                        </h3>
+                        <p class="text-sm text-text-muted dark:text-gray-400 leading-relaxed">
+                            Find eligible scholarships with deadlines and success tips personalized for you.
+                        </p>
+                        <div
+                            class="mt-4 flex items-center text-primary text-sm font-bold opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
+                            <a href="scholarship.html">Find Scholarships <span
+                                    class="material-symbols-outlined text-base ml-1">arrow_forward</span></a>
+                        </div>
+                    </div>
+
+                    <!-- LOR Generator -->
+                    <div
+                        class="group relative p-6 bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-300 hover:shadow-soft hover:border-primary/50 hover:-translate-y-1">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white">
+                            <span class="material-symbols-outlined text-2xl">description</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-text-main dark:text-white mb-2">
+                            LOR Generator
+                        </h3>
+                        <p class="text-sm text-text-muted dark:text-gray-400 leading-relaxed">
+                            Generate strong academic or professional Letters of Recommendation with AI assistance.
+                        </p>
+                        <div
+                            class="mt-4 flex items-center text-primary text-sm font-bold opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
+                            <a href="ai-form.html">Generate LOR <span
+                                    class="material-symbols-outlined text-base ml-1">arrow_forward</span></a>
+                        </div>
+                    </div>
+
+                    <!-- Visa Document Checker -->
+                    <div
+                        class="group relative p-6 bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-300 hover:shadow-soft hover:border-primary/50 hover:-translate-y-1">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white">
+                            <span class="material-symbols-outlined text-2xl">verified</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-text-main dark:text-white mb-2">
+                            Visa Document Checker
+                        </h3>
+                        <p class="text-sm text-text-muted dark:text-gray-400 leading-relaxed">
+                            AI scans your visa documents to detect missing files and risk factors.
+                        </p>
+                        <div
+                            class="mt-4 flex items-center text-primary text-sm font-bold opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
+                            Check Documents <span class="material-symbols-outlined text-base ml-1">arrow_forward</span>
+                        </div>
+                    </div>
+
+                    <!-- Career Outcome Predictor -->
+                    <div
+                        class="group relative p-6 bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-300 hover:shadow-soft hover:border-primary/50 hover:-translate-y-1">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white">
+                            <span class="material-symbols-outlined text-2xl">work</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-text-main dark:text-white mb-2">
+                            Career Outcome AI
+                        </h3>
+                        <p class="text-sm text-text-muted dark:text-gray-400 leading-relaxed">
+                            Predict job roles, salaries, and PR opportunities after completing your course.
+                        </p>
+                        <div
+                            class="mt-4 flex items-center text-primary text-sm font-bold opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
+                            View Outcomes <span class="material-symbols-outlined text-base ml-1">arrow_forward</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Featured Universities Section -->
+        <section class="py-16 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-[1280px] mx-auto">
+                <div class="flex flex-col sm:flex-row justify-between items-end mb-10 gap-4">
+                    <div>
+                        <h2 class="text-3xl font-bold text-text-main dark:text-white tracking-tight">Top Rated
+                            Institutions</h2>
+                        <p class="mt-2 text-text-muted dark:text-gray-400">Explore universities with high acceptance
+                            rates for international students.</p>
+                    </div>
+                    <a class="hidden sm:flex items-center text-primary font-bold hover:text-primary-hover"
+                        href="search.html">
+                        View all universities <span class="material-symbols-outlined ml-1">arrow_right_alt</span>
+                    </a>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- University Card 1 -->
+                    <div
+                        class="group bg-card-light dark:bg-card-dark rounded-2xl overflow-hidden shadow-card hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 flex flex-col h-full">
+                        <div class="relative h-40 overflow-hidden">
+                            <img alt="Aerial view of Oxford University campus buildings"
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                data-alt="Classic university campus buildings with green lawns"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJ0aLfrLUOY0tCgeK5AYnDICZ1_Z0FKJZFzGUCwRKjbN7ZlGmHKESq4y5GKyvXLJryf_N5kMSFOALlgcZvNBvrxfoj2p6Jeq_muKDSLbyPIef29sKTUIcMz9oUmgQy6SWcBVZpS3qRBX94nmPuRYaFJO3B5wX9PQrNfrn7hj_YDgJhXy9Ke2rDKurYdLQEMI4LEK30MHH5snfLy9z_RFAQpEI2G86J6QbG1KQG4_aNLpKJiPit_Q153qSzdOBKT-EsTDP0bgf-DnD3" />
+                            <div
+                                class="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-bold shadow-sm text-text-main flex items-center gap-1">
+                                <span class="material-symbols-outlined text-yellow-500 text-sm">trophy</span> #1 QS Rank
+                            </div>
+                        </div>
+                        <div class="p-5 flex flex-col flex-1">
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <div
+                                    class="w-12 h-12 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center p-1 shrink-0 -mt-10 shadow-md z-10 bg-white">
+                                    <span class="material-symbols-outlined text-3xl text-primary">school</span>
+                                </div>
+                                <span
+                                    class="text-xs font-medium text-text-muted bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">Public</span>
+                            </div>
+                            <h3
+                                class="text-lg font-bold text-text-main dark:text-white mb-1 leading-tight group-hover:text-primary transition-colors">
+                                University of Oxford</h3>
+                            <div class="flex items-center text-text-muted text-sm mb-4">
+                                <span class="material-symbols-outlined text-base mr-1"
+                                    data-location="Oxford, UK">location_on</span> Oxford, UK
+                            </div>
+                            <div
+                                class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                                <span class="text-xs font-semibold text-text-muted">Courses: 350+</span>
+                                <a href="university.html"
+                                    class="text-primary hover:text-primary-hover font-bold text-sm">View
+                                    Profile</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- University Card 2 -->
+                    <div
+                        class="group bg-card-light dark:bg-card-dark rounded-2xl overflow-hidden shadow-card hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 flex flex-col h-full">
+                        <div class="relative h-40 overflow-hidden">
+                            <img alt="Modern architecture of MIT buildings"
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                data-alt="Modern university building with glass facade"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIcFEO83cObTWZGSG666j_1LS-EJ92EP3VsJeQu3_4Mx9A3fR6IVgs1aQBxu7naLedIaUPF3_hx9HZ5IluF0hPThkBR8Qi94RBMTWHO8vqOMewYtyHpc2YGYroitNvGHee55o_qFx5eWVIueOfNxTFcMEPmNdJCVq7pI901vZLS7mUdj5M_O2C9v-iA0qWGW7gej7l95A3EfcBt7wexMdNPafgitC-UAOXkBcq80C7_H6giVkmhvv2MXRfYY1VKgrhyWUEymCy_qkq" />
+                            <div
+                                class="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-bold shadow-sm text-text-main flex items-center gap-1">
+                                <span class="material-symbols-outlined text-yellow-500 text-sm">trophy</span> #3 QS Rank
+                            </div>
+                        </div>
+                        <div class="p-5 flex flex-col flex-1">
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <div
+                                    class="w-12 h-12 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center p-1 shrink-0 -mt-10 shadow-md z-10 bg-white">
+                                    <span class="material-symbols-outlined text-3xl text-primary">science</span>
+                                </div>
+                                <span
+                                    class="text-xs font-medium text-text-muted bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">Private</span>
+                            </div>
+                            <h3
+                                class="text-lg font-bold text-text-main dark:text-white mb-1 leading-tight group-hover:text-primary transition-colors">
+                                MIT</h3>
+                            <div class="flex items-center text-text-muted text-sm mb-4">
+                                <span class="material-symbols-outlined text-base mr-1"
+                                    data-location="Cambridge, USA">location_on</span> Cambridge, USA
+                            </div>
+                            <div
+                                class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                                <span class="text-xs font-semibold text-text-muted">Courses: 120+</span>
+                                <a href="university.html"
+                                    class="text-primary hover:text-primary-hover font-bold text-sm">View
+                                    Profile</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- University Card 3 -->
+                    <div
+                        class="group bg-card-light dark:bg-card-dark rounded-2xl overflow-hidden shadow-card hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 flex flex-col h-full">
+                        <div class="relative h-40 overflow-hidden">
+                            <img alt="University of Toronto historic stone buildings"
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                data-alt="Historic stone university buildings with ivy"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNg1yje75D0mEnPGFXIix6wR9O-zSgzQnEW-4nL3aniEu_9AkoEcgs_-6XjtsqOw448A94ZDY0a29Mybzmq3f_xFYE2FfZbXK4nhm5vO2MKFItNTDtDcsPQT5zaOGY_6jVWryyK3IixWLePNNYa5isWjAESRyILXU7EGG9vcRM4m3UAetT5SzULj_2t4wdcVTNyAKvH-mhS4vKIAtxPHmeR5XUa_Ewcn64oJ1u_FlRYXdIzuSvtK2V_8le-mYBBhU9tNosgGHRAYp5" />
+                            <div
+                                class="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-bold shadow-sm text-text-main flex items-center gap-1">
+                                <span class="material-symbols-outlined text-yellow-500 text-sm">trophy</span> #21 QS
+                                Rank
+                            </div>
+                        </div>
+                        <div class="p-5 flex flex-col flex-1">
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <div
+                                    class="w-12 h-12 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center p-1 shrink-0 -mt-10 shadow-md z-10 bg-white">
+                                    <span class="material-symbols-outlined text-3xl text-primary">account_balance</span>
+                                </div>
+                                <span
+                                    class="text-xs font-medium text-text-muted bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">Public</span>
+                            </div>
+                            <h3
+                                class="text-lg font-bold text-text-main dark:text-white mb-1 leading-tight group-hover:text-primary transition-colors">
+                                University of Toronto</h3>
+                            <div class="flex items-center text-text-muted text-sm mb-4">
+                                <span class="material-symbols-outlined text-base mr-1"
+                                    data-location="Toronto, Canada">location_on</span> Toronto, Canada
+                            </div>
+                            <div
+                                class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                                <span class="text-xs font-semibold text-text-muted">Courses: 400+</span>
+                                <a href="university.html"
+                                    class="text-primary hover:text-primary-hover font-bold text-sm">View
+                                    Profile</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- University Card 4 -->
+                    <div
+                        class="group bg-card-light dark:bg-card-dark rounded-2xl overflow-hidden shadow-card hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 flex flex-col h-full">
+                        <div class="relative h-40 overflow-hidden">
+                            <img alt="Modern glass building of a university in Singapore"
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                data-alt="Futuristic university campus architecture"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaNHpGuyzddlqxJBcO4igJnVoGd_LJgihlqzb-ZP-SMEZvhGWV614A4qf7C8U8Mvi0Anff0_ig3paZznn0mM3CSxO0otAdEDtEX29ZQ-oTHgHwMcJPoku-ltQcxXIh2XBA3AQQPQQwqLdi-nukdvlQF0fB-AYLEzKQ8M3c3E_HXMlSmUzx1_G9AameNAfsT23_DX0L7gn2ilemybq3_cx6qXTAvI4xKIbeR5wH7E7udsDBIx4G6V8tdM6NFsdC06G1oAhv3q4TW51t" />
+                            <div
+                                class="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-bold shadow-sm text-text-main flex items-center gap-1">
+                                <span class="material-symbols-outlined text-yellow-500 text-sm">trophy</span> #11 QS
+                                Rank
+                            </div>
+                        </div>
+                        <div class="p-5 flex flex-col flex-1">
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <div
+                                    class="w-12 h-12 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center p-1 shrink-0 -mt-10 shadow-md z-10 bg-white">
+                                    <span class="material-symbols-outlined text-3xl text-primary">apartment</span>
+                                </div>
+                                <span
+                                    class="text-xs font-medium text-text-muted bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">Private</span>
+                            </div>
+                            <h3
+                                class="text-lg font-bold text-text-main dark:text-white mb-1 leading-tight group-hover:text-primary transition-colors">
+                                National University of Singapore</h3>
+                            <div class="flex items-center text-text-muted text-sm mb-4">
+                                <span class="material-symbols-outlined text-base mr-1"
+                                    data-location="Singapore">location_on</span> Singapore
+                            </div>
+                            <div
+                                class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                                <span class="text-xs font-semibold text-text-muted">Courses: 280+</span>
+                                <a href="university.html"
+                                    class="text-primary hover:text-primary-hover font-bold text-sm">View
+                                    Profile</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-center sm:hidden">
+                    <a href="university-comparision.html"
+                        class="w-full px-6 py-3 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-bold text-text-main dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                        View all universities
+                    </a>
+                </div>
+            </div>
+        </section>
+        <!-- Popular Courses Section -->
+        <section class="py-16 px-4 sm:px-6 lg:px-8 bg-background-light dark:bg-background-dark">
+            <div class="max-w-[1280px] mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-text-main dark:text-white">
+                        Browse Popular Courses Worldwide
+                    </h2>
+                    <p class="mt-2 text-text-muted dark:text-gray-400">
+                        Explore high-demand courses chosen by international students
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Course Card -->
+                    <div class="p-6 bg-card-light dark:bg-card-dark rounded-2xl shadow-card hover:shadow-xl transition">
+                        <h3 class="text-lg font-bold mb-2">MS in Computer Science</h3>
+                        <p class="text-sm text-text-muted mb-3">
+                            Available in USA, UK, Canada
+                        </p>
+                        <div class="flex justify-between text-xs font-semibold text-text-muted">
+                            <span>Duration: 2 Years</span>
+                            <span class="text-green-600">Applications Open</span>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-card-light dark:bg-card-dark rounded-2xl shadow-card hover:shadow-xl transition">
+                        <h3 class="text-lg font-bold mb-2">MBA</h3>
+                        <p class="text-sm text-text-muted mb-3">
+                            USA, UK, Australia
+                        </p>
+                        <div class="flex justify-between text-xs font-semibold text-text-muted">
+                            <span>Duration: 1-2 Years</span>
+                            <span class="text-green-600">Applications Open</span>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-card-light dark:bg-card-dark rounded-2xl shadow-card hover:shadow-xl transition">
+                        <h3 class="text-lg font-bold mb-2">Data Science</h3>
+                        <p class="text-sm text-text-muted mb-3">
+                            Canada, Germany, UK
+                        </p>
+                        <div class="flex justify-between text-xs font-semibold text-text-muted">
+                            <span>Duration: 2 Years</span>
+                            <span class="text-orange-500">Closing Soon</span>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-card-light dark:bg-card-dark rounded-2xl shadow-card hover:shadow-xl transition">
+                        <h3 class="text-lg font-bold mb-2">Artificial Intelligence</h3>
+                        <p class="text-sm text-text-muted mb-3">
+                            USA, Singapore
+                        </p>
+                        <div class="flex justify-between text-xs font-semibold text-text-muted">
+                            <span>Duration: 2 Years</span>
+                            <span class="text-red-500">Closed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Blog Section -->
+        <section
+            class="py-16 px-4 sm:px-6 lg:px-8 bg-white dark:bg-card-dark border-t border-gray-100 dark:border-gray-800">
+            <div class="max-w-[1280px] mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-text-main dark:text-white">
+                        Latest Study Abroad Insights
+                    </h2>
+                    <p class="mt-2 text-text-muted dark:text-gray-400">
+                        Expert tips, guides, and admission updates
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Blog Card 1 -->
+                    <div
+                        class="bg-background-light dark:bg-background-dark rounded-2xl overflow-hidden shadow-card hover:shadow-xl transition">
+                        <img src="https://placehold.co/600x400?text=University+Image" class="h-40 w-full object-cover"
+                            alt="Study Abroad Image">
+                        <div class="p-5">
+                            <span class="text-xs font-bold text-primary uppercase">
+                                Study Abroad
+                            </span>
+                            <h3 class="mt-2 font-bold text-lg">
+                                MS in USA: Complete Guide for 2025
+                            </h3>
+                            <p class="text-sm text-text-muted mt-2">
+                                Eligibility, cost, scholarships & job scope explained.
+                            </p>
+                            <div class="mt-4 text-sm font-bold text-primary">
+                                Read More →
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Blog Card 2 -->
+                    <div
+                        class="bg-background-light dark:bg-background-dark rounded-2xl overflow-hidden shadow-card hover:shadow-xl transition">
+                        <img src="https://placehold.co/600x400?text=University+Image" class="h-40 w-full object-cover"
+                            alt="Visa Interview">
+                        <div class="p-5">
+                            <span class="text-xs font-bold text-primary uppercase">
+                                Visa Guide
+                            </span>
+                            <h3 class="mt-2 font-bold text-lg">
+                                How to Crack Student Visa Interview
+                            </h3>
+                            <p class="text-sm text-text-muted mt-2">
+                                Common questions & winning answers.
+                            </p>
+                            <div class="mt-4 text-sm font-bold text-primary">
+                                Read More →
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Blog Card 3 -->
+                    <div
+                        class="bg-background-light dark:bg-background-dark rounded-2xl overflow-hidden shadow-card hover:shadow-xl transition">
+                        <img src="https://placehold.co/600x400?text=University+Image" class="h-40 w-full object-cover"
+                            alt="Resume Tips">
+                        <div class="p-5">
+                            <span class="text-xs font-bold text-primary uppercase">
+                                SOP & Resume
+                            </span>
+                            <h3 class="mt-2 font-bold text-lg">
+                                SOP Writing Mistakes to Avoid
+                            </h3>
+                            <p class="text-sm text-text-muted mt-2">
+                                Improve acceptance chances with these tips.
+                            </p>
+                            <div class="mt-4 text-sm font-bold text-primary">
+                                Read More →
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Newsletter / CTA -->
+        <section class="py-16 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-[1280px] mx-auto bg-primary rounded-3xl p-8 md:p-12 overflow-hidden relative">
+                <!-- Abstract decorative circles -->
+                <div class="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/10 rounded-full blur-3xl">
+                </div>
+                <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-64 h-64 bg-white/10 rounded-full blur-3xl">
+                </div>
+                <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div class="flex-1 text-center md:text-left">
+                        <h2 class="text-3xl font-black text-white mb-3">Ready to start your journey?
+                        </h2>
+                        <p class="text-blue-50 text-lg max-w-xl">Join over 50,000 students finding their
+                            dream
+                            universities and scholarships on UniHunt today.</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                        <button
+                            class="px-8 py-3.5 bg-white text-primary font-bold rounded-xl shadow-lg hover:shadow-xl hover:bg-gray-50 transition-all transform hover:-translate-y-0.5">
+                            Create Free Account
+                        </button>
+                        <button
+                            class="px-8 py-3.5 bg-primary-hover border border-white/20 text-white font-bold rounded-xl hover:bg-black/20 transition-all">
+                            Talk to Counselor
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-card-dark border-t border-gray-100 dark:border-gray-800 pt-16 pb-8">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
+                <div class="col-span-2 lg:col-span-2 pr-8">
+                    <div class="flex items-center gap-2 mb-4">
+                        <img src="https://unihunt.org/public/assets/images/favicon_io/favicon.ico" class="w-8 h-8"
+                            alt="" srcset="">
+                        <span class="text-3xl font-bold tracking-tight">
+                            <span class="text-secondary dark:text-secondary">UNI</span>
+                            <span class="text-primary dark:text-white">HUNT</span>
+                        </span>
+                    </div>
+                    <p class="text-text-muted text-sm leading-relaxed mb-6 max-w-xs">
+                        Unihunt Course Finder helps students discover the best courses and universities worldwide. With
+                        an easy-to-use interface, it provides detailed course information, admission requirements, and
+                        tuition fees. Find your ideal program quickly and efficiently, making your study abroad journey
+                        smoother and hassle-free.
+                    </p>
+                    <div class="flex gap-4">
+                        <a class="text-gray-400 hover:text-primary transition-colors" href="#"><span
+                                class="sr-only">Twitter</span>
+                            <svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewbox="0 0 24 24">
+                                <path
+                                    d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84">
+                                </path>
+                            </svg>
+                        </a>
+                        <a class="text-gray-400 hover:text-primary transition-colors" href="#"><span
+                                class="sr-only">LinkedIn</span>
+                            <svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewbox="0 0 24 24">
+                                <path clip-rule="evenodd"
+                                    d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+                                    fill-rule="evenodd"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="font-bold text-text-main dark:text-white mb-4">Platform</h3>
+                    <ul class="space-y-3 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="university.html">Browse
+                                Universities</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="course.html">Courses</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="scholarship.html">Scholarships</a>
+                        </li>
+                        <li><a class="hover:text-primary transition-colors" href="events.html">Events</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-text-main dark:text-white mb-4">Resources</h3>
+                    <ul class="space-y-3 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="blog.html">Blog</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="ai-sop.html">SOP Generator</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="ai-resume.html">Resume Builder</a>
+                        </li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Student Guides</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-text-main dark:text-white mb-4">Company</h3>
+                    <ul class="space-y-3 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="about.html">About Us</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Careers</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="partnership.html">Partner with us</a>
+                        </li>
+                        <li><a class="hover:text-primary transition-colors" href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div
+                class="border-t border-gray-100 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-text-muted">
+                <p>© 2026 UniHunt Inc. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a class="hover:text-text-main transition-colors" href="privacy.html">Privacy Policy</a>
+                    <a class="hover:text-text-main transition-colors" href="#">Terms of Service</a>
+                    <a class="hover:text-text-main transition-colors" href="cookies.html">Cookie Settings</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

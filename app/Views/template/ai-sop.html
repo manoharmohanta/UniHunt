@@ -1,0 +1,516 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>AI SOP Generator - Final Edit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
+    <script src="https://unpkg.com/heroicons@2.1.5/outline/index.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#012169",          // Brand navy blue
+                        "primary-hover": "#023a8f",    // Lighter navy for hover
+                        "primary-soft": "#e6ebf4",     // Soft blue background
+
+                        "background-light": "#f8fafc", // Cool light background
+                        "background-dark": "#0c1424",  // Dark navy background
+
+                        "card-light": "#ffffff",
+                        "card-dark": "#121a2f",        // Dark card with blue tone
+
+                        "text-main": "#0b1220",        // Deep readable text
+                        "text-muted": "#5b6b8a",       // Muted blue-gray text
+
+                        "border-light": "#dbe2ef",
+                        "border-dark": "#1e2a44",
+
+                        "success": "#1b9c85",
+                        "warning": "#f0b429",
+                        "danger": "#d64545",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    boxShadow: {
+                        "soft": "0 4px 20px -2px rgba(14, 117, 129, 0.08)",
+                        "card": "0 2px 8px -1px rgba(0, 0, 0, 0.05)",
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <script>
+        // Check local time (Day: 6 AM - 6 PM)
+        const hours = new Date().getHours();
+        const isDayTime = hours >= 6 && hours < 18;
+        
+        // Check storage or default to time-based
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && !isDayTime)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        }
+    </script>
+<style>
+        /* Custom scrollbar for editor if needed */
+        .editor-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .editor-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .editor-content::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+
+        [contenteditable]:empty:before {
+            content: attr(placeholder);
+            color: #94a3b8;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-[#101818] dark:text-[#f0f4f5] font-display overflow-x-hidden flex flex-col min-h-screen">
+    <!-- Top Navigation -->
+    <nav
+        class="sticky top-0 z-50 w-full bg-card-light/90 dark:bg-card-dark/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-3">
+                    <img 
+                        src="https://unihunt.org/public/assets/img/logo.webp" 
+                        alt="UniHunt Logo"
+                        class="h-8 w-auto"
+                    />
+                </a>
+                <!-- Desktop Links -->
+                <div class="hidden md:flex items-center gap-8">
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="university.html">Universities</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="course.html">Courses</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="#">AI Tools</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="blog.html">Blog</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="#">Accommodation</a>
+                    <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                        href="contact.html">Contact Us</a>
+                </div>
+                <!-- CTA Buttons -->
+                <div class="hidden md:flex items-center gap-3">
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleTheme()" 
+                        class="p-2 mr-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-text-main dark:text-white" 
+                        aria-label="Toggle Dark Mode">
+                        <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+                        <span class="material-symbols-outlined hidden dark:block">light_mode</span>
+                    </button>
+                    <a href="forget.html"
+                        class="px-4 py-2 text-sm font-bold text-text-main bg-background-light hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 rounded-lg transition-colors">
+                        Sign In
+                    </a>
+                    <button
+                        class="px-4 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-hover rounded-lg shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
+                        Get Started
+                    </button>
+                </div>
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button class="text-text-main dark:text-white p-2">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main class="flex-1 layout-container flex flex-col w-full max-w-[1280px] mx-auto px-4 md:px-8 py-6">
+        <!-- Breadcrumbs -->
+        <div class="flex flex-wrap gap-2 px-0 pb-4">
+            <a class="text-[#5e888d] text-sm font-medium leading-normal hover:text-primary transition-colors"
+                href="#">AI Tools</a>
+            <span class="text-[#5e888d] text-sm font-medium leading-normal">/</span>
+            <a class="text-[#5e888d] text-sm font-medium leading-normal hover:text-primary transition-colors"
+                href="#">SOP Generator</a>
+            <span class="text-[#5e888d] text-sm font-medium leading-normal">/</span>
+            <span class="text-[#101818] dark:text-white text-sm font-medium leading-normal">Final Edit</span>
+        </div>
+        <!-- Page Header & Actions -->
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8">
+            <div class="flex flex-col gap-2 max-w-2xl">
+                <h1
+                    class="text-[#101818] dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
+                    Review &amp; Refine Your SOP</h1>
+                <p class="text-[#5e888d] text-base md:text-lg font-normal leading-normal">Your Statement of Purpose is
+                    ready. Make final tweaks or adjust the tone before exporting.</p>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <button
+                    class="flex items-center justify-center rounded-lg h-10 px-4 bg-white border border-[#d0d7de] hover:bg-[#f0f4f5] text-[#101818] text-sm font-bold shadow-sm transition-all group">
+                    <span
+                        class="material-symbols-outlined mr-2 text-[18px] text-[#5e888d] group-hover:text-primary">content_copy</span>
+                    <span>Copy Text</span>
+                </button>
+                <button
+                    class="flex items-center justify-center rounded-lg h-10 px-4 bg-white border border-[#d0d7de] hover:bg-[#f0f4f5] text-[#101818] text-sm font-bold shadow-sm transition-all group">
+                    <span
+                        class="material-symbols-outlined mr-2 text-[18px] text-[#5e888d] group-hover:text-primary">bookmark</span>
+                    <span>Save Draft</span>
+                </button>
+                <button
+                    class="flex items-center justify-center rounded-lg h-10 px-6 bg-primary hover:bg-primary-hover text-white text-sm font-bold shadow-md transition-all">
+                    <span class="material-symbols-outlined mr-2 text-[18px]">download</span>
+                    <span>Download PDF</span>
+                </button>
+            </div>
+        </div>
+        <!-- Main Workspace: Split View -->
+        <div class="flex flex-col lg:grid lg:grid-cols-12 gap-8 h-full min-h-[600px]">
+            <!-- Left Column: Editor (8 cols) -->
+            <div class="lg:col-span-8 flex flex-col gap-4">
+                <!-- Toolbar & Tone Selector -->
+                <div
+                    class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-[#252525] p-2 rounded-xl shadow-sm border border-[#e5e7eb] dark:border-[#333]">
+                    <div class="flex items-center gap-2 pl-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-[#5e888d]">Tone:</span>
+                    </div>
+                    <!-- Segmented Buttons from provided list, styled -->
+                    <div class="flex h-9 p-1 bg-[#f0f4f5] dark:bg-[#333] rounded-lg w-full sm:w-auto">
+                        <label
+                            class="flex-1 sm:flex-none cursor-pointer flex items-center justify-center rounded px-4 text-xs font-medium transition-all text-[#5e888d] hover:text-[#101818] dark:hover:text-white">
+                            <span>Academic</span>
+                            <input class="hidden" name="tone" type="radio" value="Academic" />
+                        </label>
+                        <label
+                            class="flex-1 sm:flex-none cursor-pointer flex items-center justify-center rounded px-4 text-xs font-medium transition-all bg-white dark:bg-[#444] shadow-sm text-primary dark:text-white font-bold">
+                            <span>Passionate</span>
+                            <input checked="" class="hidden" name="tone" type="radio" value="Passionate" />
+                        </label>
+                        <label
+                            class="flex-1 sm:flex-none cursor-pointer flex items-center justify-center rounded px-4 text-xs font-medium transition-all text-[#5e888d] hover:text-[#101818] dark:hover:text-white">
+                            <span>Professional</span>
+                            <input class="hidden" name="tone" type="radio" value="Professional" />
+                        </label>
+                    </div>
+                    <div class="hidden sm:block w-px h-6 bg-gray-200 dark:bg-[#444]"></div>
+                    <div class="flex items-center gap-1 pr-2 overflow-x-auto">
+                        <button class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-[#333] text-gray-500" title="Undo">
+                            <span class="material-symbols-outlined text-[18px]">undo</span>
+                        </button>
+                        <button class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-[#333] text-gray-500" title="Redo">
+                            <span class="material-symbols-outlined text-[18px]">redo</span>
+                        </button>
+                        <button
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-[#333] text-xs font-medium text-primary ml-2">
+                            <span class="material-symbols-outlined text-[16px]">auto_fix_high</span>
+                            AI Rephrase
+                        </button>
+                    </div>
+                </div>
+                <!-- Editor Surface -->
+                <div
+                    class="relative flex-1 bg-white dark:bg-[#1e1e1e] rounded-xl shadow-[0_2px_12px_-4px_rgba(0,0,0,0.08)] border border-[#e5e7eb] dark:border-[#333] overflow-hidden flex flex-col">
+                    <!-- Page simulation wrapper -->
+                    <div class="flex-1 overflow-y-auto p-8 md:p-12 bg-white dark:bg-[#1e1e1e]">
+                        <article class="prose prose-slate dark:prose-invert max-w-none editor-content outline-none"
+                            contenteditable="true">
+                            <h3 class="text-2xl font-bold mb-6 text-[#101818] dark:text-white">Statement of Purpose</h3>
+                            <p class="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
+                                To the Graduate Admissions Committee,
+                            </p>
+                            <p class="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
+                                My journey in Computer Science began not in a classroom, but in a small, cluttered
+                                garage where I dismantled my first radio. This initial curiosity about how signals
+                                traversed the air evolved into a profound passion for networked systems. Today, as I
+                                apply for the Master of Science in Computer Science at <span
+                                    class="bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 px-1 rounded">[University
+                                    Name]</span>, I am driven by a desire to contribute to the next generation of
+                                decentralized network architectures.
+                            </p>
+                            <!-- AI Suggestion Highlight -->
+                            <div class="relative group my-6">
+                                <div
+                                    class="absolute -left-3 -right-3 -top-2 -bottom-2 bg-primary/5 rounded-lg border border-primary/20 hidden group-hover:block transition-all">
+                                </div>
+                                <p class="relative z-10 mb-0 text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
+                                    During my undergraduate studies at Tech University, I led a team to develop a
+                                    latency-reducing protocol for IoT devices. While the project faced initial setbacks
+                                    due to hardware limitations, our persistence led to a 15% efficiency gain in data
+                                    packet transmission. This experience taught me that rigorous testing and iterative
+                                    design are the bedrocks of innovation.
+                                </p>
+                                <!-- Floating AI Action -->
+                                <div
+                                    class="absolute right-0 -top-10 hidden group-hover:flex items-center gap-1 bg-[#101818] text-white text-xs px-2 py-1.5 rounded-lg shadow-lg z-20 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                                    <span
+                                        class="material-symbols-outlined text-[14px] text-primary-300">colors_spark</span>
+                                    <span class="font-semibold">AI Suggestion:</span>
+                                    <span class="opacity-90">Make more academic?</span>
+                                    <button
+                                        class="ml-2 px-2 py-0.5 bg-primary rounded hover:bg-primary-hover transition-colors font-bold">Apply</button>
+                                </div>
+                            </div>
+                            <p class="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
+                                I am particularly drawn to Professor Smith's research on edge computing optimization. I
+                                believe my background in distributed systems aligns perfectly with the lab's current
+                                objectives. Your program offers the unique blend of theoretical rigor and practical
+                                application that I need to transition from a student to a researcher capable of making
+                                tangible impacts in the field.
+                            </p>
+                            <p class="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
+                                In conclusion, I am eager to bring my technical skills and unyielding curiosity to your
+                                diverse academic community. Thank you for considering my application.
+                            </p>
+                        </article>
+                    </div>
+                    <!-- Editor Footer Status -->
+                    <div
+                        class="border-t border-gray-100 dark:border-[#333] px-6 py-3 bg-[#fbfcfd] dark:bg-[#252525] flex justify-between text-xs text-gray-500 font-medium">
+                        <span>Last auto-saved 2 mins ago</span>
+                        <span>Page 1 of 1</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Right Column: Checklist (4 cols) -->
+            <div class="lg:col-span-4 flex flex-col gap-6">
+                <!-- Health Score Card -->
+                <div
+                    class="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 shadow-sm border border-[#e5e7eb] dark:border-[#333] flex items-center justify-between relative overflow-hidden">
+                    <div class="relative z-10">
+                        <p class="text-[#5e888d] text-sm font-bold uppercase tracking-wider mb-1">SOP Health Score</p>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-5xl font-black text-primary tracking-tighter">92</span>
+                            <span class="text-gray-400 font-bold text-lg">/100</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2 font-medium">Great job! Almost ready to submit.</p>
+                    </div>
+                    <!-- Decorative Circular Chart BG -->
+                    <div
+                        class="absolute right-[-20px] top-[-20px] size-32 rounded-full border-[12px] border-[#f0f4f5] dark:border-[#333] z-0">
+                    </div>
+                    <div
+                        class="absolute right-[-20px] top-[-20px] size-32 rounded-full border-[12px] border-primary border-t-transparent border-l-transparent -rotate-45 z-0">
+                    </div>
+                    <span
+                        class="material-symbols-outlined relative z-10 text-4xl text-primary bg-primary/10 p-2 rounded-full">check_circle</span>
+                </div>
+                <!-- Checklist Accordion -->
+                <div class="flex flex-col gap-4">
+                    <h3 class="text-[#101818] dark:text-white font-bold text-lg">Final Checklist</h3>
+                    <!-- Item 1: Word Count (Success) -->
+                    <div
+                        class="group bg-white dark:bg-[#1e1e1e] rounded-lg border border-[#e5e7eb] dark:border-[#333] hover:shadow-md transition-all overflow-hidden">
+                        <div class="p-4 flex items-start gap-3 cursor-pointer">
+                            <div
+                                class="mt-0.5 rounded-full bg-green-100 dark:bg-green-900/30 p-1 text-green-600 dark:text-green-400">
+                                <span class="material-symbols-outlined text-[20px]">check</span>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="font-bold text-[#101818] dark:text-white text-sm">Word Count</span>
+                                    <span class="text-xs font-bold text-green-600 dark:text-green-400">Perfect</span>
+                                </div>
+                                <p class="text-xs text-gray-500 mb-2">385 words (Target: 300-500)</p>
+                                <div class="w-full bg-gray-100 dark:bg-[#333] rounded-full h-1.5">
+                                    <div class="bg-green-500 h-1.5 rounded-full" style="width: 78%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Item 2: Grammar (Success) -->
+                    <div
+                        class="group bg-white dark:bg-[#1e1e1e] rounded-lg border border-[#e5e7eb] dark:border-[#333] hover:shadow-md transition-all overflow-hidden">
+                        <div class="p-4 flex items-start gap-3 cursor-pointer">
+                            <div
+                                class="mt-0.5 rounded-full bg-green-100 dark:bg-green-900/30 p-1 text-green-600 dark:text-green-400">
+                                <span class="material-symbols-outlined text-[20px]">check</span>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="font-bold text-[#101818] dark:text-white text-sm">Grammar &amp;
+                                        Spelling</span>
+                                    <span class="text-xs font-bold text-green-600 dark:text-green-400">Clean</span>
+                                </div>
+                                <p class="text-xs text-gray-500">0 critical errors found by AI.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Item 3: Structure (Warning) -->
+                    <div
+                        class="group bg-white dark:bg-[#1e1e1e] rounded-lg border border-amber-200 dark:border-amber-900/50 hover:shadow-md transition-all overflow-hidden">
+                        <div class="p-4 flex items-start gap-3 cursor-pointer">
+                            <div
+                                class="mt-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 p-1 text-amber-600 dark:text-amber-400">
+                                <span class="material-symbols-outlined text-[20px]">priority_high</span>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="font-bold text-[#101818] dark:text-white text-sm">Structure
+                                        Check</span>
+                                    <span class="text-xs font-bold text-amber-600 dark:text-amber-400">1
+                                        Suggestion</span>
+                                </div>
+                                <p class="text-xs text-gray-500 mb-3">The conclusion feels slightly generic for
+                                    [University Name].</p>
+                                <button
+                                    class="w-full text-xs font-bold text-primary bg-primary/10 hover:bg-primary/20 py-2 rounded transition-colors text-center">
+                                    Fix with AI
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Item 4: Uniqueness (Neutral) -->
+                    <div
+                        class="group bg-white dark:bg-[#1e1e1e] rounded-lg border border-[#e5e7eb] dark:border-[#333] hover:shadow-md transition-all overflow-hidden opacity-80 hover:opacity-100">
+                        <div class="p-4 flex items-start gap-3 cursor-pointer">
+                            <div
+                                class="mt-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 p-1 text-blue-600 dark:text-blue-400">
+                                <span class="material-symbols-outlined text-[20px]">fingerprint</span>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="font-bold text-[#101818] dark:text-white text-sm">Uniqueness</span>
+                                    <span class="text-xs font-bold text-blue-600 dark:text-blue-400">Good</span>
+                                </div>
+                                <p class="text-xs text-gray-500">Includes 3 specific personal anecdotes.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Promo / Upgrade box -->
+                <div
+                    class="mt-auto bg-gradient-to-br from-[#006e7a] to-[#004e57] rounded-xl p-5 text-white relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10">
+                        <span class="material-symbols-outlined text-6xl">school</span>
+                    </div>
+                    <h4 class="font-bold text-sm mb-2 relative z-10">Need a Human Review?</h4>
+                    <p class="text-xs opacity-90 mb-3 relative z-10">Get an expert from Oxford or Harvard to review your
+                        SOP within 24 hours.</p>
+                    <button
+                        class="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white text-xs font-bold py-2 rounded transition-colors relative z-10 border border-white/30">
+                        Explore Premium Services
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-card-dark border-t border-gray-100 dark:border-gray-800 pt-16 pb-8">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
+                <div class="col-span-2 lg:col-span-2 pr-8">
+                    <div class="flex items-center gap-2 mb-4">
+                        <img src="https://unihunt.org/public/assets/images/favicon_io/favicon.ico" class="w-8 h-8" alt="" srcset="">
+                        <span class="text-xl font-bold tracking-tight">
+                            <span class="text-secondary dark:text-secondary">UNI</span>
+                            <span class="text-primary dark:text-primary">HUNT</span>
+                        </span>
+                    </div>
+                    <p class="text-text-muted text-sm leading-relaxed mb-6 max-w-xs">
+                        Unihunt Course Finder helps students discover the best courses and universities worldwide. With
+                        an easy-to-use interface, it provides detailed course information, admission requirements, and
+                        tuition fees. Find your ideal program quickly and efficiently, making your study abroad journey
+                        smoother and hassle-free.
+                    </p>
+                    <div class="flex gap-4">
+                        <a class="text-gray-400 hover:text-primary transition-colors" href="#"><span
+                                class="sr-only">Twitter</span>
+                            <svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewbox="0 0 24 24">
+                                <path
+                                    d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84">
+                                </path>
+                            </svg>
+                        </a>
+                        <a class="text-gray-400 hover:text-primary transition-colors" href="#"><span
+                                class="sr-only">LinkedIn</span>
+                            <svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewbox="0 0 24 24">
+                                <path clip-rule="evenodd"
+                                    d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+                                    fill-rule="evenodd"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="font-bold text-text-main dark:text-white mb-4">Platform</h3>
+                    <ul class="space-y-3 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="#">Browse Universities</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Courses</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Scholarships</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Events</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-text-main dark:text-white mb-4">Resources</h3>
+                    <ul class="space-y-3 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="#">Blog</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">SOP Generator</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Resume Builder</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Student Guides</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-text-main dark:text-white mb-4">Company</h3>
+                    <ul class="space-y-3 text-sm text-text-muted">
+                        <li><a class="hover:text-primary transition-colors" href="#">About Us</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Careers</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Partner with us</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div
+                class="border-t border-gray-100 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-text-muted">
+                <p>Â© 2026 UniHunt Inc. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a class="hover:text-text-main transition-colors" href="#">Privacy Policy</a>
+                    <a class="hover:text-text-main transition-colors" href="#">Terms of Service</a>
+                    <a class="hover:text-text-main transition-colors" href="#">Cookie Settings</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
+

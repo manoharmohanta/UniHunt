@@ -1,0 +1,592 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Blog Post Detail View - UniHunt</title>
+    <!-- Google Fonts: Manrope -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet" />
+    <!-- Material Symbols -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
+    <script src="https://unpkg.com/heroicons@2.1.5/outline/index.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#012169",          // Brand navy blue
+                        "primary-hover": "#023a8f",    // Lighter navy for hover
+                        "primary-soft": "#e6ebf4",     // Soft blue background
+
+                        "background-light": "#f8fafc", // Cool light background
+                        "background-dark": "#0c1424",  // Dark navy background
+
+                        "card-light": "#ffffff",
+                        "card-dark": "#121a2f",        // Dark card with blue tone
+
+                        "text-main": "#0b1220",        // Deep readable text
+                        "text-muted": "#5b6b8a",       // Muted blue-gray text
+
+                        "border-light": "#dbe2ef",
+                        "border-dark": "#1e2a44",
+
+                        "success": "#1b9c85",
+                        "warning": "#f0b429",
+                        "danger": "#d64545",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    boxShadow: {
+                        "soft": "0 4px 20px -2px rgba(14, 117, 129, 0.08)",
+                        "card": "0 2px 8px -1px rgba(0, 0, 0, 0.05)",
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <script>
+        // Check local time (Day: 6 AM - 6 PM)
+        const hours = new Date().getHours();
+        const isDayTime = hours >= 6 && hours < 18;
+        
+        // Check storage or default to time-based
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && !isDayTime)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Custom scrollbar for sidebar if needed */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-[#111816] dark:text-gray-100 antialiased font-display transition-colors duration-200">
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+        <!-- Top Navigation -->
+        <nav
+            class="sticky top-0 z-50 w-full bg-card-light/90 dark:bg-card-dark/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <!-- Logo -->
+                    <a href="index.html" class="flex items-center gap-3">
+                        <img 
+                            src="https://unihunt.org/public/assets/img/logo.webp" 
+                            alt="UniHunt Logo"
+                            class="h-8 w-auto"
+                        />
+                    </a>
+                    <!-- Desktop Links -->
+                    <div class="hidden md:flex items-center gap-8">
+                        <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                            href="university.html">Universities</a>
+                        <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                            href="course.html">Courses</a>
+                        <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                            href="#">AI Tools</a>
+                        <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                            href="blog.html">Blog</a>
+                        <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                            href="#">Accommodation</a>
+                        <a class="text-sm font-semibold text-text-main hover:text-primary dark:text-gray-200 dark:hover:text-primary transition-colors"
+                            href="contact.html">Contact Us</a>
+                    </div>
+                    <!-- CTA Buttons -->
+                    <div class="hidden md:flex items-center gap-3">
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleTheme()" 
+                        class="p-2 mr-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-text-main dark:text-white" 
+                        aria-label="Toggle Dark Mode">
+                        <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+                        <span class="material-symbols-outlined hidden dark:block">light_mode</span>
+                    </button>
+                        <a href="forget.html"
+                            class="px-4 py-2 text-sm font-bold text-text-main bg-background-light hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 rounded-lg transition-colors">
+                            Sign In
+                        </a>
+                        <button
+                            class="px-4 py-2 text-sm font-bold text-white bg-primary hover:bg-primary-hover rounded-lg shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
+                            Get Started
+                        </button>
+                    </div>
+                    <!-- Mobile Menu Button -->
+                    <div class="md:hidden flex items-center">
+                        <button class="text-text-main dark:text-white p-2">
+                            <span class="material-symbols-outlined">menu</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <!-- Main Layout -->
+        <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                <!-- Left Column: Article Content (8 cols) -->
+                <article class="lg:col-span-8 flex flex-col gap-8">
+                    <!-- Breadcrumbs & Meta -->
+                    <div class="flex flex-col gap-6">
+                        <nav class="flex flex-wrap items-center gap-2 text-sm text-[#61897f] dark:text-gray-400">
+                            <a class="hover:text-primary transition-colors" href="#">Home</a>
+                            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                            <a class="hover:text-primary transition-colors" href="#">Blog</a>
+                            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                            <span class="text-[#111816] dark:text-white font-medium">Study Abroad Guides</span>
+                        </nav>
+                        <h1
+                            class="text-[#111816] dark:text-white text-3xl sm:text-4xl md:text-5xl font-black leading-[1.15] tracking-tight">
+                            Top 10 Universities for Computer Science in Europe: A 2024 Guide
+                        </h1>
+                        <div
+                            class="flex items-center justify-between border-y border-gray-200 dark:border-gray-800 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-200">
+                                    <img alt="Author" class="w-full h-full object-cover"
+                                        data-alt="Portrait of Sarah Jenkins, the author"
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdTQ73TsRwHhVuDjXgIF-r7s5yScsr6zrxZVJJhsQ2CUMzF715mbyH3t84iL0jj3S04GvDj_CVUIl4VT28LxHFQ2Bs5NnH-SLplmNXwRH-TYHWm_ZQU6QYGaTxBXJIGUsj8PDU3To4ZDPdtDAb9tN0UeOMF6b6WswM0p3lfvxUMl-0P9Ow4v8lG8BeBQnN0zeah0XbIyR1MRZO6HpnX6thFZruWTjRl1wMSuK8DCh5btusO0LPALPqCn78At0zmTZynO8Xctwviuog" />
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-[#111816] dark:text-white text-sm font-bold">Sarah Jenkins</span>
+                                    <span class="text-[#61897f] dark:text-gray-400 text-xs">Senior Education
+                                        Consultant</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 text-[#61897f] dark:text-gray-400 text-sm">
+                                <span class="hidden sm:inline">Oct 24, 2023</span>
+                                <span class="w-1 h-1 rounded-full bg-gray-300 hidden sm:block"></span>
+                                <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                                    <span class="material-symbols-outlined text-[16px]">schedule</span>
+                                    <span>8 min read</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Featured Image -->
+                    <div class="w-full aspect-[16/9] rounded-xl overflow-hidden shadow-sm">
+                        <div class="w-full h-full bg-gray-200 bg-center bg-cover"
+                            data-alt="Students walking through a modern university library atrium with glass ceiling"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCeRftJ-JF9EVfGEQ27apFygJtIv93f7bTQmbrHaL90hQxXEl9nhVGpsSubvtQdhIZvZ9ah_xbNsr3mmNHTg5853-GJQD2cN9acMbJmzXZb0XTR1QEyQB87i9bTrNkkqLAHjD86enFs3aOkcQYihCdbFoujM4z7ltFZQXBU0nNDEFy4Zw_Y9mzdivQhw4mMTxWo--asDwGNN0DqaQhF-7slqja1hNSVWfVacx6nP-LizKx7HjasgyPFZ0CEefjpkYyQQv9omgLE84iK');">
+                        </div>
+                    </div>
+                    <!-- Article Body -->
+                    <div class="prose prose-lg max-w-none text-[#33383D] dark:text-gray-300 leading-relaxed space-y-6">
+                        <p class="text-xl leading-8 font-medium text-[#111816] dark:text-white">
+                            European universities are increasingly becoming the top choice for computer science students
+                            worldwide. The combination of rigorous academic standards, affordable tuition, and rich
+                            cultural immersion makes these programs uniquely attractive compared to their US
+                            counterparts.
+                        </p>
+                        <p>
+                            In recent years, the landscape of technology education has shifted. While Silicon Valley
+                            remains a powerhouse, Europe's tech hubs in Berlin, London, Zurich, and Amsterdam are
+                            fostering a new generation of innovators. This guide breaks down the institutions leading
+                            this charge.
+                        </p>
+                        <h2 class="text-2xl font-bold text-[#111816] dark:text-white mt-8 mb-4">Why Choose Europe for
+                            CS?</h2>
+                        <p>
+                            Beyond the obvious allure of travel, studying in Europe offers tangible career benefits.
+                            Many programs are now taught entirely in English, removing language barriers for
+                            international students. Furthermore, the Bologna Process ensures that degrees are recognized
+                            globally.
+                        </p>
+                        <!-- Pull Quote -->
+                        <figure
+                            class="my-8 pl-6 border-l-4 border-primary bg-primary/5 dark:bg-primary/10 p-6 rounded-r-lg">
+                            <blockquote class="text-xl italic font-medium text-[#111816] dark:text-white">
+                                "The cultural immersion combined with rigorous academic standards makes these programs
+                                unique. Students graduate not just with coding skills, but with a global perspective
+                                that employers crave."
+                            </blockquote>
+                            <figcaption class="mt-4 text-sm text-[#61897f] font-semibold uppercase tracking-wider">â€” Dr.
+                                Elena Rossi, Zurich Tech Institute</figcaption>
+                        </figure>
+                        <h2 class="text-2xl font-bold text-[#111816] dark:text-white mt-8 mb-4">Ranking Criteria</h2>
+                        <p>
+                            Our ranking methodology focuses on three core pillars: <strong>Research Output</strong>,
+                            <strong>Industry Connections</strong>, and <strong>Student Satisfaction</strong>. We
+                            analyzed data from over 200 institutions to bring you this definitive list.
+                        </p>
+                        <ul class="list-disc pl-5 space-y-2 marker:text-primary">
+                            <li><strong>Research Output:</strong> Number of citations per faculty member.</li>
+                            <li><strong>Industry Connections:</strong> Partnership programs with companies like Google,
+                                Spotify, and SAP.</li>
+                            <li><strong>Student Satisfaction:</strong> Based on the annual EuroStudent survey results.
+                            </li>
+                        </ul>
+                        <h3 class="text-xl font-bold text-[#111816] dark:text-white mt-8 mb-3">1. ETH Zurich
+                            (Switzerland)</h3>
+                        <p>
+                            Consistently ranked among the top 10 globally, ETH Zurich is the crown jewel of European
+                            engineering. Its computer science department is renowned for work in AI and robotics.
+                        </p>
+                        <div class="my-6 rounded-lg overflow-hidden">
+                            <div class="w-full h-64 bg-gray-200 bg-center bg-cover"
+                                data-alt="Modern architecture of a university campus building against a blue sky"
+                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCBnkSPnlj3IbK14KwYui6OqvaK0j4lUIsUgNiWGq6YgQ_fvuLAKqqI3xVLhIN6_vOi4R3UR8XTYpQCT0VARctNlkGQsHfTNCF8b_csRE1hqSM8RbErpkNVU9zXaWyJs5OyU6trFfFOnrmrEKk4F6wO81BpKl1IxQCTMy86qYp2LMezw9llFvsNt-9GuuE9J_mgA0fzj-uUNS_Ngdcz0kxL_Rrvf4qYyFEgxKC7tqA6o7Ys8Hxz8T_6WbwWzFvtl8RnQBUXezIoMl_5');">
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2 italic text-center">The main building of ETH Zurich.
+                            </p>
+                        </div>
+                        <h3 class="text-xl font-bold text-[#111816] dark:text-white mt-8 mb-3">2. University of Oxford
+                            (UK)</h3>
+                        <p>
+                            While steeped in history, Oxford's CS department is thoroughly modern. The university
+                            focuses heavily on the theoretical underpinnings of computer science, preparing students for
+                            deep research roles.
+                        </p>
+                    </div>
+                    <!-- Interaction Area: Tags & Share (Bottom) -->
+                    <div class="border-t border-gray-200 dark:border-gray-800 pt-8 mt-4">
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            <span
+                                class="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-[#61897f] dark:text-gray-300 text-sm rounded-full font-medium">#StudyAbroad</span>
+                            <span
+                                class="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-[#61897f] dark:text-gray-300 text-sm rounded-full font-medium">#ComputerScience</span>
+                            <span
+                                class="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-[#61897f] dark:text-gray-300 text-sm rounded-full font-medium">#Europe</span>
+                            <span
+                                class="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-[#61897f] dark:text-gray-300 text-sm rounded-full font-medium">#UniversityRankings</span>
+                        </div>
+                    </div>
+                    <!-- Newsletter CTA -->
+                    <div class="bg-primary rounded-xl p-8 sm:p-10 text-white relative overflow-hidden group">
+                        <div
+                            class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700">
+                        </div>
+                        <div class="relative z-10">
+                            <span class="material-symbols-outlined text-[40px] mb-4">mail</span>
+                            <h3 class="text-2xl font-bold mb-2">Don't miss the next guide</h3>
+                            <p class="text-white/80 mb-6 max-w-md">Join 45,000+ students getting weekly study abroad
+                                tips, scholarship alerts, and university guides.</p>
+                            <form class="flex flex-col sm:flex-row gap-3">
+                                <input
+                                    class="flex-1 px-4 py-3 rounded-lg text-[#111816] focus:outline-none focus:ring-2 focus:ring-white/50 border-none"
+                                    placeholder="Your email address" type="email" />
+                                <button
+                                    class="px-6 py-3 bg-[#1c1e22] text-white font-bold rounded-lg hover:bg-black transition-colors shadow-lg"
+                                    type="button">
+                                    Subscribe Free
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- Comments Section -->
+                    <section class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
+                        <h3 class="text-xl font-bold text-[#111816] dark:text-white mb-6 flex items-center gap-2">
+                            Discussion <span class="text-gray-400 text-sm font-normal">(12 comments)</span>
+                        </h3>
+                        <!-- Comment Input -->
+                        <div class="flex gap-4 mb-10">
+                            <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex-shrink-0"></div>
+                            <div class="flex-1">
+                                <textarea
+                                    class="w-full bg-[#f0f4f3] dark:bg-gray-800 border-none rounded-lg p-4 text-sm focus:ring-1 focus:ring-primary resize-y min-h-[100px] text-[#111816] dark:text-white"
+                                    placeholder="Share your thoughts or ask a question..."></textarea>
+                                <div class="flex justify-end mt-2">
+                                    <button
+                                        class="px-4 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-[#085d48] transition-colors">Post
+                                        Comment</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Single Comment -->
+                        <div class="space-y-6">
+                            <div class="flex gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold flex-shrink-0">
+                                    JD</div>
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="font-bold text-[#111816] dark:text-white text-sm">John Doe</span>
+                                        <span class="text-gray-400 text-xs">â€¢ 2 hours ago</span>
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                                        Does ETH Zurich offer full scholarships for international students from non-EU
+                                        countries? I'm struggling to find clear info on their site.
+                                    </p>
+                                    <button class="text-[#61897f] text-xs font-bold mt-2 hover:underline">Reply</button>
+                                </div>
+                            </div>
+                            <!-- Threaded Reply -->
+                            <div class="flex gap-4 pl-14">
+                                <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                                    <img alt="Sarah" class="w-full h-full object-cover"
+                                        data-alt="Author Sarah Jenkins thumbnail"
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAB8ETD_RrKe7S2KSmxEqC8--VyAjPNatlMwpNqjZnUhBoyGCg5_OwjimapxWPGX52GKxQZVNbVuasisfpoDA0SSz3nQdO5ShjuEVKWcUOSJ-OyHCdeAYnps5rugAQuVZNbS8tuqXWTIxt-59LTTS4Cel6ICSPXrYiHvMNq8hor-KtPRNM48MA0-RragIyUVJo6LVxDmrmcgMa3pEOVRrNJx9rkf21dV8v9HYj2riHRUXsbX3jDmBEze5JMFgKnCGiChX15_EDLjHgk" />
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="font-bold text-[#111816] dark:text-white text-sm">Sarah
+                                            Jenkins</span>
+                                        <span
+                                            class="bg-primary/10 text-primary text-[10px] px-1.5 py-0.5 rounded uppercase font-bold tracking-wide">Author</span>
+                                        <span class="text-gray-400 text-xs">â€¢ 1 hour ago</span>
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                                        Hi John! Yes, they have the "Excellence Scholarship &amp; Opportunity
+                                        Programme". It's very competitive but covers full study and living costs. I'll
+                                        link a guide in the next reply!
+                                    </p>
+                                    <button class="text-[#61897f] text-xs font-bold mt-2 hover:underline">Reply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </article>
+                <!-- Right Sidebar: Sticky Widgets (4 cols) -->
+                <aside class="hidden lg:block lg:col-span-4 relative">
+                    <div class="sticky top-28 flex flex-col gap-6">
+                        <!-- Table of Contents -->
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                            <h4 class="font-bold text-[#111816] dark:text-white mb-4 flex items-center gap-2">
+                                <span
+                                    class="material-symbols-outlined text-primary text-[20px]">format_list_bulleted</span>
+                                In this article
+                            </h4>
+                            <ul
+                                class="space-y-3 relative border-l-2 border-gray-100 dark:border-gray-700 ml-1.5 pl-4 text-sm">
+                                <li class="relative">
+                                    <div
+                                        class="absolute -left-[19px] top-1.5 h-2 w-2 rounded-full bg-primary ring-4 ring-white dark:ring-gray-800">
+                                    </div>
+                                    <a class="text-primary font-bold" href="#">Introduction</a>
+                                </li>
+                                <li>
+                                    <a class="text-gray-500 dark:text-gray-400 hover:text-primary transition-colors"
+                                        href="#">Why Choose Europe?</a>
+                                </li>
+                                <li>
+                                    <a class="text-gray-500 dark:text-gray-400 hover:text-primary transition-colors"
+                                        href="#">Ranking Criteria</a>
+                                </li>
+                                <li>
+                                    <a class="text-gray-500 dark:text-gray-400 hover:text-primary transition-colors"
+                                        href="#">The Top 10 List</a>
+                                </li>
+                                <li>
+                                    <a class="text-gray-500 dark:text-gray-400 hover:text-primary transition-colors"
+                                        href="#">Application Tips</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- Social Share -->
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                            <h4
+                                class="font-bold text-[#111816] dark:text-white text-sm uppercase tracking-wider mb-4 text-center">
+                                Share this guide</h4>
+                            <div class="flex justify-center gap-4">
+                                <button
+                                    class="w-10 h-10 rounded-full bg-[#1877F2]/10 text-[#1877F2] flex items-center justify-center hover:bg-[#1877F2] hover:text-white transition-all">
+                                    <span class="material-symbols-outlined text-[20px]">share</span>
+                                </button>
+                                <button
+                                    class="w-10 h-10 rounded-full bg-[#1DA1F2]/10 text-[#1DA1F2] flex items-center justify-center hover:bg-[#1DA1F2] hover:text-white transition-all">
+                                    <span class="material-symbols-outlined text-[20px]">send</span>
+                                </button>
+                                <button
+                                    class="w-10 h-10 rounded-full bg-[#0A66C2]/10 text-[#0A66C2] flex items-center justify-center hover:bg-[#0A66C2] hover:text-white transition-all">
+                                    <span class="material-symbols-outlined text-[20px]">link</span>
+                                </button>
+                                <button
+                                    class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center hover:bg-gray-600 hover:text-white transition-all">
+                                    <span class="material-symbols-outlined text-[20px]">bookmark</span>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Related Articles -->
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                            <h4 class="font-bold text-[#111816] dark:text-white mb-4">Related Articles</h4>
+                            <div class="flex flex-col gap-4">
+                                <!-- Related Item 1 -->
+                                <a class="group flex gap-3 items-start" href="#">
+                                    <div class="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                                        <div class="w-full h-full bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
+                                            data-alt="Students gathered in a sunny park studying"
+                                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC2jmHkhoe8oVmMnm_YZa74cykuIGPQc0Op4VzwT3IbrAePbFtApYWseQ7ZGKeXuX4Pc0dKirxr1TtjsVKBn5qX1aWXHrsAXViApqXjM8rRdvszRgEBs9yrRI495C-6fJryEfNF8CvUw3DrRkjSr-2JBiEsWV6r6wXF_4jDjdWuwJoKHARbdpsp7tdUHMS3fTKGLtKsJQvRHH7tuvtiLgogAT-iwFNTbYBu_932Nco0x9yOmGM29tfPDL8L_TQwC0pZX1ewtX2BGuPP')">
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <h5
+                                            class="text-sm font-bold text-[#111816] dark:text-white leading-snug group-hover:text-primary transition-colors">
+                                            How to get a Student Visa in Germany</h5>
+                                        <span class="text-xs text-gray-400 mt-1">5 min read</span>
+                                    </div>
+                                </a>
+                                <!-- Related Item 2 -->
+                                <a class="group flex gap-3 items-start" href="#">
+                                    <div class="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                                        <div class="w-full h-full bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
+                                            data-alt="Stack of books on a desk"
+                                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCGHOT-WYapbBLiE4X0aoE4TdAfqDEJIAqd32iO4NCb7Ir0PUub4L8WqJhqdjhXsLfIYYuQX7qIEbfuGvzOb1WySyGxPvDlz6-PKdjA2EzSlGRwc7ArKPls2m2JlCLO356uw4VEtsWne_kTMP5d3dgI2V-VrsXXTAJLHZeu_mUOcHIg2kMG8qL0tGD8wE7S-E4TQUK2I1Oz0JM1gemYFLAjxQoi3WPx1RtPhnAhES55vhYpOYGO8u3rum_DXoo3wkeibIzc1UXCP--E')">
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <h5
+                                            class="text-sm font-bold text-[#111816] dark:text-white leading-snug group-hover:text-primary transition-colors">
+                                            Scholarships for International Students 2024</h5>
+                                        <span class="text-xs text-gray-400 mt-1">12 min read</span>
+                                    </div>
+                                </a>
+                                <!-- Related Item 3 -->
+                                <a class="group flex gap-3 items-start" href="#">
+                                    <div class="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                                        <div class="w-full h-full bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
+                                            data-alt="Meeting room with people collaborating"
+                                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBPx2m0J8NE58BuTvyrR9zV6_wqpm42tZKj4XlVfU282248U6iEk7tCjNjp18YeozTpZNbO9luDFshqX6KYxLXaOtXEOyi1aX9zaUvt-mREy89GssHKPPXyhVRmQTdPmmi_-Pf05Je6Mkih7C7tN-rcCRWL95M5RE6t4VwXN-sJi-AE7nhr94wYPcwmtbt0gPWeDh7mgg3kUG2shaW4tLeGgbJQThc6AMYPqGzMPUANGyF4a75NX2hyoY9p2QIHeTrz2BbyjfIzrkII')">
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <h5
+                                            class="text-sm font-bold text-[#111816] dark:text-white leading-snug group-hover:text-primary transition-colors">
+                                            Top Tech Hubs in Europe for Grads</h5>
+                                        <span class="text-xs text-gray-400 mt-1">6 min read</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <button
+                                class="w-full mt-6 py-2 text-sm font-bold text-[#61897f] hover:text-primary hover:bg-[#f0f4f3] dark:hover:bg-gray-700 rounded-lg transition-colors">
+                                View all guides
+                            </button>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </main>
+        <!-- Footer -->
+        <footer class="bg-white dark:bg-card-dark border-t border-gray-100 dark:border-gray-800 pt-16 pb-8">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
+                    <div class="col-span-2 lg:col-span-2 pr-8">
+                        <div class="flex items-center gap-2 mb-4">
+                            <img src="https://unihunt.org/public/assets/images/favicon_io/favicon.ico" class="w-8 h-8" alt="" srcset="">
+                            <span class="text-xl font-bold tracking-tight">
+                                <span class="text-secondary dark:text-secondary">UNI</span>
+                                <span class="text-primary dark:text-primary">HUNT</span>
+                            </span>
+                        </div>
+                        <p class="text-text-muted text-sm leading-relaxed mb-6 max-w-xs">
+                            Unihunt Course Finder helps students discover the best courses and universities worldwide. With
+                            an easy-to-use interface, it provides detailed course information, admission requirements, and
+                            tuition fees. Find your ideal program quickly and efficiently, making your study abroad journey
+                            smoother and hassle-free.
+                        </p>
+                        <div class="flex gap-4">
+                            <a class="text-gray-400 hover:text-primary transition-colors" href="#"><span
+                                    class="sr-only">Twitter</span>
+                                <svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewbox="0 0 24 24">
+                                    <path
+                                        d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84">
+                                    </path>
+                                </svg>
+                            </a>
+                            <a class="text-gray-400 hover:text-primary transition-colors" href="#"><span
+                                    class="sr-only">LinkedIn</span>
+                                <svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewbox="0 0 24 24">
+                                    <path clip-rule="evenodd"
+                                        d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+                                        fill-rule="evenodd"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-text-main dark:text-white mb-4">Platform</h3>
+                        <ul class="space-y-3 text-sm text-text-muted">
+                            <li><a class="hover:text-primary transition-colors" href="university.html">Browse Universities</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="course.html">Courses</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="scholarship.html">Scholarships</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="events.html">Events</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-text-main dark:text-white mb-4">Resources</h3>
+                        <ul class="space-y-3 text-sm text-text-muted">
+                            <li><a class="hover:text-primary transition-colors" href="blog.html">Blog</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="ai-sop.html">SOP Generator</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="ai-resume.html">Resume Builder</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="#">Student Guides</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-text-main dark:text-white mb-4">Company</h3>
+                        <ul class="space-y-3 text-sm text-text-muted">
+                            <li><a class="hover:text-primary transition-colors" href="about.html">About Us</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="#">Careers</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="partnership.html">Partner with us</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="contact.html">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div
+                    class="border-t border-gray-100 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-text-muted">
+                    <p>Â© 2026 UniHunt Inc. All rights reserved.</p>
+                    <div class="flex gap-6">
+                        <a class="hover:text-text-main transition-colors" href="privacy.html">Privacy Policy</a>
+                        <a class="hover:text-text-main transition-colors" href="#">Terms of Service</a>
+                        <a class="hover:text-text-main transition-colors" href="cookies.html">Cookie Settings</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+
+</html>
+
